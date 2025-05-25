@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
-
+    "boto3>=1.38.23",
 ]
 
 [dependency-groups]
@@ -15,6 +15,7 @@ dev = [
     "pytest-testdox>=3.1.0",
     "pytest-cov>=6.1.1",
     "ruff>=0.11.11",
+    "moto>=5.1.5",
 ]
 
 [tool.pytest.ini_options]
