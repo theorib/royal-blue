@@ -46,7 +46,7 @@ jobs:
         run: uv run bandit -r src
   
   deploy-terraform:
-    #   if: false # this will cause the job to be skipped - delete to enable
+    if: github.event_name == 'workflow_dispatch'
     name: Deploy Royal Blue Terraform infrastructure
     runs-on: ubuntu-latest
     steps:
