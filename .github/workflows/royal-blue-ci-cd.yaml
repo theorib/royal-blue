@@ -1,0 +1,46 @@
+name: Royal Blue CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    name: Run Python tests, check test coverage, check formatting and security scan
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - name: checkout-github-repo
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.8"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run uv sync
+        run: uv sync --frozen
+
+      - name: Run Ruff Lint (Check Only)
+        run: uv run ruff check --output-format=github .
+
+      - name: Run Ruff Format (Check Only)
+        run: uv run ruff format --verbose --check .
+
+      - name: Run Pytest Tests
+        run: uv run pytest
+
+      - name: Run Test Coverage
+        run: uv run pytest --cov=src tests/
+
+      - name: Run Bandit Security Scan
+        run: uv run bandit -r src
