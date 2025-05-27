@@ -1,4 +1,4 @@
-name: Commit to main
+name: Royal Blue CI/CD
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests-formatting-qc:
-    name: Run all Python tests, formatting and quality control
+    name: Run Python tests, check test coverage, check formatting and security scan
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: ${{ github.workspace }}
