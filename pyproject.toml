@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
+    "bandit>=1.8.3",
     "boto3>=1.38.23",
 ]
 
