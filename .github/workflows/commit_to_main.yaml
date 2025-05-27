@@ -27,7 +27,7 @@ jobs:
           python-version: "3.13"
 
       - name: Run uv sync
-        run: uv sync --frozen-lockfile
+        run: uv sync --frozen
 
       - name: Run Ruff Lint (Check Only)
         run: uv run ruff check --output-format=github .
