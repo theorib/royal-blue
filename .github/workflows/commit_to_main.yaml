@@ -39,7 +39,7 @@ jobs:
         run: uv run pytest
 
       - name: Run Test Coverage
-        run: uv run pytest --cov=src test/
+        run: uv run pytest --cov=src tests/
 
       - name: Run Bandit Security Scan
         run: uv run bandit -r src
