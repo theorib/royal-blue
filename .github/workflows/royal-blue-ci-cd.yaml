@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tests-formatting-qc:
+  run-tests:
     name: Run Python tests, check test coverage, check formatting and security scan
     runs-on: ubuntu-latest
     env:
