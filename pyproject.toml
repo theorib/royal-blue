@@ -8,6 +8,7 @@ requires-python = ">=3.13"
 dependencies = [
     "bandit>=1.8.3",
     "boto3>=1.38.23",
+    "python-dotenv>=1.1.0",
 ]
 
 [dependency-groups]
