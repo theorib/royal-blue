@@ -6,7 +6,7 @@ import pytest
 
 
 @mock_aws
-class TestS3Functionality:
+class TestS3AddFunctionality:
     def test_add_to_s3_success(self, s3_client):
         bucket = "test-bucket"
         key = "test_obj.txt"
