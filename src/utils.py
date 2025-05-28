@@ -18,7 +18,10 @@ def add_to_s3_bucket(client, bucket_name, key, body):
         {
             "Success": {
                 "Message": "File uploaded to bucket_name"
-                "Data": ""
+                "Data": {
+                    "Bucket" : bucket_name,
+                    "Key" : key
+                }
             }
         }
         or
