@@ -1,6 +1,58 @@
 from botocore.exceptions import ClientError
 
 
+def get_file_from_s3_bucket(client, bucket_name, key):
+    """Retrieves a file object from the specified S3 bucket.
+
+    This function attempts to download the content of an object stored in an Amazon S3 bucket
+    using the given bucket name and object key.
+
+    Args:
+        s3_client: A Boto3 S3 client instance used to interact with AWS S3.
+        bucket_name: The name of the S3 bucket (string).
+        key: The key (i.e., path/filename) of the object to retrieve (string).
+
+    Returns:
+        dict: A JSON-style dictionary with the result of the operation, e.g.:
+        {
+            "Success": {
+                "Message": "File retrieved from s3://bucket_name/key",
+                "Data": <bytes or string content of the file>
+            }
+        }
+        or
+        {
+            "Error": {
+                "Message": "Description of the error that occurred"
+            }
+        }
+    """
+    try:
+        response = client.get_object(Bucket=bucket_name, Key=key)
+        content = response["Body"].read().decode("utf-8")
+        return {
+            "Success": {
+                "Message": f"File retrieved from s3://{bucket_name}/{key}",
+                "Data": content,
+            }
+        }
+
+    except ClientError as err:
+        code = err.response["Error"]["Code"]
+
+        error_map = {
+            "NoSuchBucket": "The specified bucket does not exist.",
+            "NoSuchKey": "The specified key does not exist.",
+            "InvalidBucketName": "The S3 bucket name provided is invalid.",
+            "AccessDenied": "Access denied when reading from the S3 bucket.",
+            "InternalError": "An internal AWS error occurred. Try again.",
+            "SlowDown": "Too many requests sent to S3. Try again later.",
+        }
+        message = error_map.get(code)
+
+        return {"Error": {"Message": f"{code}: {message}"}}
+
+
 def add_to_s3_bucket(client, bucket_name, key, body):
     """Uploads a file or data object to the specified S3 bucket.
 
