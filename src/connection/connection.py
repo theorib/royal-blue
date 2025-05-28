@@ -12,6 +12,9 @@ def connect_db():
         host = os.getenv("DB_HOST")
         database = os.getenv("DB_DATABASE")
         port = os.getenv("DB_PORT")
+        
+        if not all([user, password, host, database, port]):
+            return "ERROR: Missing required environment variable"
 
         conn = pg8000.dbapi.Connection(
         database=database,
