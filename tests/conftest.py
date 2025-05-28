@@ -1,7 +1,6 @@
 from moto import mock_aws
 import pytest
 import boto3
-import json
 
 @pytest.fixture(scope='class')
 def s3_client():

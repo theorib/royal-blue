@@ -2,7 +2,6 @@ from src.utils import add_to_s3_bucket
 from unittest.mock import Mock
 from moto import mock_aws
 from botocore.exceptions import ClientError
-import boto3
 import pytest
 
 @mock_aws

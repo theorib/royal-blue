@@ -1,4 +1,3 @@
-import boto3
 from botocore.exceptions import ClientError
 
 def add_to_s3_bucket(client, bucket_name, key, body):
