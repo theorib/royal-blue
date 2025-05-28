@@ -1,5 +1,6 @@
 from botocore.exceptions import ClientError
 
+
 def add_to_s3_bucket(client, bucket_name, key, body):
     """Uploads a file or data object to the specified S3 bucket.
 
@@ -33,28 +34,19 @@ def add_to_s3_bucket(client, bucket_name, key, body):
         return {
             "Success": {
                 "Message": f"File uploaded to s3://{bucket_name}/{key}",
-                "Data": {
-                    "Bucket": bucket_name,
-                    "Key": key
-                }
+                "Data": {"Bucket": bucket_name, "Key": key},
             }
         }
     except ClientError as err:
-        code = err.response['Error']['Code']
+        code = err.response["Error"]["Code"]
 
         error_map = {
             "NoSuchBucket": "The specified bucket does not exist.",
             "AccessDenied": "Access denied when writing to the S3 bucket.",
             "InvalidBucketName": "The specified bucket is not valid.",
             "BucketAlreadyExists": "The bucket name is already in use.",
-            "BucketAlreadyOwnedByYou": "You already own this bucket."
+            "BucketAlreadyOwnedByYou": "You already own this bucket.",
         }
         message = error_map.get(code)
-            
-        return {
-            "Error": { 
-                "Message": f"{code}: {message}"
-            }
-        }
-    
-    
+
+        return {"Error": {"Message": f"{code}: {message}"}}
