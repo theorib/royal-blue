@@ -31,4 +31,5 @@ def extract_all_tables_as_dataframes():
     finally:
         close_db(conn)
 
+
 print(extract_all_tables_as_dataframes())
