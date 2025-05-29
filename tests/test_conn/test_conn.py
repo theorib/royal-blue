@@ -16,11 +16,11 @@ class TestConnection:
             conn = connect_db()
             assert conn is not None
             mock_conn.assert_called_once_with(
-                database="testdb",
                 user="user",
                 password="pass",
                 host="localhost",
-                port="5432",
+                port=5432,
+                database="testdb",
             )
 
     @pytest.mark.it(
@@ -39,5 +39,5 @@ class TestConnection:
         monkeypatch.delenv("DB_USER", raising=False)
         with patch("pg8000.dbapi.Connection") as mock_conn:
             result = connect_db()
-            assert "Missing required environment variable" in result
+            assert "Missing required environment variable" in result["error"]["message"]
             mock_conn.assert_not_called()
