@@ -1,16 +1,22 @@
-from src.utils import add_to_s3_bucket
 from unittest.mock import Mock
-from moto import mock_aws
-from botocore.exceptions import ClientError
+
 import pytest
+from botocore.exceptions import ClientError
+from moto import mock_aws
+
+from src.utils import add_to_s3_bucket
 
 
+@pytest.mark.describe("add_to_s3_bucket Utility Function Behaviour")
 @mock_aws
 class TestS3AddFunctionality:
-    def test_add_to_s3_success(self, s3_client):
+    @pytest.mark.it(
+        "Should check that an object is successfully uploaded to the S3 bucket"
+    )
+    def test_add_to_s3_200_success(self, s3_client):
         bucket = "test-bucket"
         key = "test_obj.txt"
-        body = '{"test": "royal blue s3 bucket"}'
+        body = '{ "test": "royal blue s3 bucket" }'
 
         s3_client.create_bucket(
             Bucket="test-bucket",
@@ -20,8 +26,8 @@ class TestS3AddFunctionality:
             client=s3_client, bucket_name=bucket, key=key, body=body
         )
 
-        assert response["Success"]["Message"] == f"File uploaded to s3://{bucket}/{key}"
-        assert response["Success"]["Data"] == {"Bucket": bucket, "Key": key}
+        assert response["success"]["message"] == f"File uploaded to s3://{bucket}/{key}"
+        assert response["success"]["data"] == {"bucket": bucket, "key": key}
 
         s3_obj = s3_client.get_object(Bucket=bucket, Key=key)
         assert s3_obj["Body"].read().decode("utf-8") == body
@@ -36,7 +42,10 @@ class TestS3AddFunctionality:
             ("BucketAlreadyOwnedByYou", "You already own this bucket."),
         ],
     )
-    def test_add_to_s3_error_responses(self, s3_client, error_code, message):
+    @pytest.mark.it(
+        "Should check that errors are handled correctly when uploading to an S3 bucket"
+    )
+    def test_add_to_s3_error_responses(self, error_code, message):
         bucket = "non-existant-bucket"
         key = "test_obj"
         body = '{"test": "royal blue s3 bucket failure"}'
@@ -51,5 +60,5 @@ class TestS3AddFunctionality:
             client=mock_client, bucket_name=bucket, key=key, body=body
         )
 
-        assert "Error" in response
-        assert message in response["Error"]["Message"]
+        assert "error" in response
+        assert message in response["error"]["message"]
