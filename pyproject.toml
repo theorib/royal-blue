@@ -28,6 +28,7 @@ dev = [
 [tool.pytest.ini_options]
 addopts = "-vvv -rP --testdox"
 pythonpath = "."
+filterwarnings = "ignore::DeprecationWarning"
 
 [tool.ruff]
 line-length = 88
