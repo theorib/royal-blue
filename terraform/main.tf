@@ -19,7 +19,7 @@ module "extract_lambda" {
 
 module "process_zone_bucket" {
   source                = "./modules/create_s3_bucket"
-  s3_bucket_name_prefix = "process-zone-bucket-"
+  s3_bucket_name_prefix = "processed-zone-bucket-"
 }
 
 module "state_bucket" {
