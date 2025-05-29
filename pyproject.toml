@@ -5,10 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 
-dependencies = [
-    "bandit>=1.8.3",
-    "boto3>=1.38.23",
-]
+dependencies = []
 
 [dependency-groups]
 dev = [
@@ -17,6 +14,8 @@ dev = [
     "pytest-cov>=6.1.1",
     "ruff>=0.11.11",
     "moto>=5.1.5",
+    "bandit>=1.8.3",
+    "boto3>=1.38.23",
 ]
 
 [tool.pytest.ini_options]
