@@ -1,6 +1,9 @@
 import pytest
 
 
+@pytest.mark.describe(
+    "Check extract_lambda interaction with Totesys DB, parquet files and ingestion_zone s3 bucket"
+)
 class TestExtractLambdaAddParquetToIngestionZone:
     @pytest.mark.skip
     @pytest.mark.it(
@@ -24,6 +27,7 @@ class TestExtractLambdaAddParquetToIngestionZone:
         pass
 
 
+@pytest.mark.describe("Check extract_lambda return values")
 class TestExtractLambdaReturn:
     @pytest.mark.skip
     @pytest.mark.it(
@@ -47,6 +51,7 @@ class TestExtractLambdaReturn:
         pass
 
 
+@pytest.mark.describe("Check extract_lambda interactions with state_management bucket")
 class TestExtractLambdaState:
     @pytest.mark.skip
     @pytest.mark.it(
@@ -63,6 +68,7 @@ class TestExtractLambdaState:
         pass
 
 
+@pytest.mark.describe("Check extract_lambda logging")
 class TestExtractLambdaLogging:
     @pytest.mark.skip
     @pytest.mark.it(
