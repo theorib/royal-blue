@@ -8,6 +8,11 @@ requires-python = ">=3.13"
 dependencies = [
     "bandit>=1.8.3",
     "boto3>=1.38.23",
+    "mock>=5.2.0",
+    "pandas>=2.2.3",
+    "pg8000>=1.31.2",
+    "pytest>=8.3.5",
+    "python-dotenv>=1.1.0",
 ]
 
 [dependency-groups]
