@@ -25,5 +25,5 @@ module "lambda_layer" {
 
 module "ingest_zone_bucket" {
   source                = "../create_s3_bucket"
-  s3_bucket_name_prefix = "ingest-bucket-"
+  s3_bucket_name_prefix = "ingestion-zone-bucket-"
 }
