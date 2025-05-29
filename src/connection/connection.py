@@ -1,6 +1,6 @@
 import os
 
-import pg8000.native
+import pg8000.dbapi
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +13,7 @@ def connect_db():
         database = os.getenv("DB_DATABASE")
         port = os.getenv("DB_PORT")
 
-        conn = pg8000.native.Connection(
+        conn = pg8000.dbapi.Connection(
         database=database,
         user=user,
         password=password,
@@ -27,10 +27,12 @@ def connect_db():
         return f"ERROR: {e}"
     
 
-def close_db(conn: pg8000.native.Connection):
+def close_db(conn: pg8000.dbapi.Connection):
     try:
         if conn:
             conn.close()
             print("CONNECTION CLOSED")
     except Exception as e:
         return f"ERROR: {e}"
+
+
