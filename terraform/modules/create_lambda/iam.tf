@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_role" "iam_for_lambda" {
-  name_prefix        = "iam_for_${var.lambda_name}_"
+  name_prefix        = "iam_for_${var.function_name}_"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
@@ -31,11 +31,11 @@ data "aws_iam_policy_document" "lambda_logging" {
       "logs:PutLogEvents",
     ]
 
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.lambda_name}:*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${var.function_name}:*"]
   }
 }
 resource "aws_iam_policy" "lambda_logging" {
-  name_prefix = "lambda-${var.lambda_name}-logging-"
+  name_prefix = "lambda-${var.function_name}-logging-"
   policy      = data.aws_iam_policy_document.lambda_logging.json
 
 }

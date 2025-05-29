@@ -1,18 +1,13 @@
 resource "aws_lambda_function" "generated_lambda" {
-    filename      = data.archive_file.lambda_function.output_path
+  filename         = var.filename
+  function_name    = var.function_name
+  handler          = var.handler
+  runtime          = var.runtime
+  source_code_hash = var.source_code_hash
+  layers           = var.layers
+  role             = aws_iam_role.iam_for_lambda.arn
 
-    function_name = var.lambda_name
-    role          = aws_iam_role.iam_for_lambda.arn
-    handler       = "${var.lambda_python_file_base_name}.${var.lambda_function_handler_name}"
-
-    source_code_hash = data.archive_file.lambda_function.output_base64sha256
-
-    runtime = var.runtime
-
-    layers = var.lambda_layers
-
-    
-    environment {
+  environment {
     variables = var.environment_variables
-    }
+  }
 }
