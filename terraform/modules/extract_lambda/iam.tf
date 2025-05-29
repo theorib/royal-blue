@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "s3_data_policy_doc" {
   statement {
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${module.ingest_zone_bucket.s3_bucket.arn}/*"]
+    resources = ["${module.ingestion_zone_bucket.s3_bucket.arn}/*"]
   }
 }
 

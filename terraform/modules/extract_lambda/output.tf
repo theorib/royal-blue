@@ -3,7 +3,7 @@ output "extract_lambda" {
 
 }
 output "ingest_zone_bucket" {
-  value = module.ingest_zone_bucket
+  value = module.ingestion_zone_bucket
 }
 
 output "archive_file" {
