@@ -6,7 +6,7 @@ module "extract_lambda" {
   runtime          = var.python_runtime
   source_code_hash = data.archive_file.extract_lambda_zip.output_base64sha256
   environment_variables = {
-    INGEST_ZONE_BUCKET_NAME = module.ingest_zone_bucket.s3_bucket.id
+    INGEST_ZONE_BUCKET_NAME = module.ingestion_zone_bucket.s3_bucket.id
   }
   layers = [module.lambda_layer.aws_lambda_layer_version.arn]
 }
@@ -23,7 +23,7 @@ module "lambda_layer" {
   python_runtime = var.python_runtime
 }
 
-module "ingest_zone_bucket" {
+module "ingestion_zone_bucket" {
   source                = "../create_s3_bucket"
-  s3_bucket_name_prefix = "ingestion-zone-bucket-"
+  s3_bucket_name_prefix = "ingestion-zone-"
 }
