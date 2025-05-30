@@ -16,8 +16,6 @@ dev = [
     "moto>=5.1.5",
     "bandit>=1.8.3",
     "boto3>=1.38.23",
-    "bandit>=1.8.3",
-    "boto3>=1.38.23",
 ]
 
 [tool.pytest.ini_options]
