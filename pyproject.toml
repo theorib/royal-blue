@@ -6,12 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 
 dependencies = [
-    "bandit>=1.8.3",
-    "boto3>=1.38.23",
-    "mock>=5.2.0",
-    "pandas>=2.2.3",
     "pg8000>=1.31.2",
-    "pytest>=8.3.5",
     "python-dotenv>=1.1.0",
 ]
 
@@ -22,6 +17,8 @@ dev = [
     "pytest-cov>=6.1.1",
     "ruff>=0.11.11",
     "moto>=5.1.5",
+    "bandit>=1.8.3",
+    "boto3>=1.38.23",
 ]
 
 [tool.pytest.ini_options]
