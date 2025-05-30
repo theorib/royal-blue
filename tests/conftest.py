@@ -22,24 +22,26 @@ def s3_client(aws_credentials):
         client = boto3.client("s3", region_name="eu-west-2")
         yield client
 
+
 @pytest.fixture(scope="function")
 def valid_data_frame_data():
     return [
         {
             "table_name": "test_table",
             "last_updated": "2025-05-27 01:23:45.678910",
-            "data_frame": pd.DataFrame({
-                "name": ["Charley", "Oliver"],
-                "age": [27, 28]
-            })
+            "data_frame": pd.DataFrame(
+                {"name": ["Charley", "Oliver"], "age": [27, 28]}
+            ),
         },
         {
             "table_name": "test_table_2",
             "last_updated": "2025-05-27 02:34:56.798101",
-            "data_frame": pd.DataFrame({
-                "country": ["Lancashire", "Greater Manchester"],
-                "city": ["Preston", "Manchester"],
-                "road": ["Victoria", "Oxford Road"]
-            })
-        }
+            "data_frame": pd.DataFrame(
+                {
+                    "country": ["Lancashire", "Greater Manchester"],
+                    "city": ["Preston", "Manchester"],
+                    "road": ["Victoria", "Oxford Road"],
+                }
+            ),
+        },
     ]
