@@ -1,7 +1,10 @@
+import logging
 import os
 
-import pg8000.dbapi
 from dotenv import load_dotenv
+from pg8000.dbapi import Connection
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -13,34 +16,25 @@ def connect_db():
     database = os.getenv("DB_DATABASE")
     port = os.getenv("DB_PORT")
 
-    if not all([user, password, host, database, port]):
-        return {
-            "error": {
-                "message": "Missing required environment variable for database connection"
-            }
-        }
-
+    conn = None
     try:
-        conn = pg8000.dbapi.Connection(
-            user=user, password=password, host=host, port=int(port), database=database
+        conn = Connection(
+            user=user,
+            password=password,
+            host=host,
+            port=int(port),
+            database=database,
         )
-        return {
-            "success": {
-                "message": "Database connection established successfully",
-                "data": conn,
-            }
-        }
-
+        return conn
     except Exception as e:
-        return {"error": {"message": f"ERROR: {e}"}}
+        logger.error(e)
+        raise e
 
 
-def close_db(conn: pg8000.dbapi.Connection):
-    if conn is None:
-        return {"error": {"message": "No active connection provided to close"}}
-
+def close_db(conn: Connection):
     try:
-        conn.close()
-        return {"success": {"message": "Database connection closed successfully"}}
+        if conn:
+            conn.close()
     except Exception as e:
-        return {"error": {"message": f"ERROR: {e}"}}
+        logger.error(e)
+        raise e
