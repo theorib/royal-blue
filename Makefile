@@ -41,3 +41,7 @@ cov: ## Run tests with coverage
 safe: ## Run Bandit security scan
 	uv run bandit -r -lll src
 
+.PHONY: checks
+checks: fix-all cov safe ## Run all checks
+
+
