@@ -30,11 +30,11 @@ jobs:
       - name: Run uv sync
         run: uv sync --frozen
 
-      - name: Run Ruff Lint (Check Only)
-        run: uv run ruff check --output-format=github .
+      - name: Run Ruff Lint
+        run: uv run ruff check --fix --output-format=github .
 
-      - name: Run Ruff Format (Check Only)
-        run: uv run ruff format --verbose --check .
+      - name: Run Ruff Format
+        run: uv run ruff format --verbose .
 
       - name: Run Pytest Tests
         run: uv run pytest
