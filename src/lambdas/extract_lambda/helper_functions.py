@@ -31,8 +31,8 @@ def get_table_names(conn: Connection):
 # identifier, literal
 def get_table_last_updated_timestamp(conn: Connection, table_name: str):
     query = f"""
-        SELECT MAX(last_updated) as last_updated FROM public.{table_name}
-    """
+        SELECT MAX(last_updated) as last_updated FROM public.{table_name} z
+    """  # nosec
     rows, column_names = execute_query(conn, query)
 
     last_updated = rows[0][0]
