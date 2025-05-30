@@ -9,10 +9,10 @@ def create_parquets_from_data_frames(data: list):
     Converts a list of data frames into in-memory Parquet files.
 
     This function receives a list of dictionaries where each dictionary represents a table
-    with metadata and a pandas DataFrame. It serializes each DataFrame into a compressed 
+    with metadata and a pandas DataFrame. It serializes each DataFrame into a compressed
     Parquet file stored in a BytesIO buffer.
 
-    If any conversion fails, the function returns an error dictionary containing the table name 
+    If any conversion fails, the function returns an error dictionary containing the table name
     and the error message. Otherwise, it returns a success dictionary with all converted files.
 
     Args:
@@ -47,41 +47,35 @@ def create_parquets_from_data_frames(data: list):
             }
     """
     parquet_files = []
-    
+
     for table in data:
-        table_name = table.get('table_name')
-        last_updated = table.get('last_updated')
-        data_frame = table.get('data_frame')
+        table_name = table.get("table_name")
+        last_updated = table.get("last_updated")
+        data_frame = table.get("data_frame")
 
         if not isinstance(data_frame, pd.DataFrame):
-            return {
-                "error": {
-                    "message": f"{table_name}: invalid data type."
-                }
-            }
+            return {"error": {"message": f"{table_name}: invalid data type."}}
 
         buffer = BytesIO()
-        
+
         try:
             data_frame.to_parquet(buffer, engine="pyarrow", compression="gzip")
             buffer.seek(0)
-            
-            parquet_files.append({
-                'table_name': table_name,
-                'last_updated': last_updated,
-                'parquet_file': buffer
-            })
-        except Exception as err:
-            return {
-                "error":{
-                    "message": f"{table_name}: {err}"
+
+            parquet_files.append(
+                {
+                    "table_name": table_name,
+                    "last_updated": last_updated,
+                    "parquet_file": buffer,
                 }
-            }
-            
+            )
+        except Exception as err:
+            return {"error": {"message": f"{table_name}: {err}"}}
+
     return {
         "success": {
             "message": "Parquet file conversion successful.",
-            "data": parquet_files
+            "data": parquet_files,
         }
     }
 
