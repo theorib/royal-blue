@@ -79,6 +79,9 @@ jobs:
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{secrets.AWS_DEFAULT_REGION}}
           
+      - name: terraform format
+        working-directory: terraform
+        run: terraform fmt -recursive
       - name: terraform init
         working-directory: terraform
         run: terraform init
