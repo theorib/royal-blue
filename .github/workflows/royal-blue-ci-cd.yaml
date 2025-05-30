@@ -43,7 +43,7 @@ jobs:
         run: uv run pytest --cov=src tests/
 
       - name: Run Bandit Security Scan
-        run: uv run bandit -r -lll src
+        run: uv run bandit -r src
   
   deploy-terraform:
     if: github.event_name == 'workflow_dispatch'
