@@ -22,6 +22,12 @@ module "etl_state_machine" {
   }
 }
 
+module "etl_scheduler" {
+  source              = "./modules/scheduler"
+  name                = "etl-sfn-scheduler"
+  schedule_expression = "rate(20 minutes)"
+  state_machine_arn   = module.etl_state_machine.state_machine["arn"]
+}
 
 module "extract_lambda" {
   source         = "./modules/extract_lambda"
