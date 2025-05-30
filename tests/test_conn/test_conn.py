@@ -25,8 +25,8 @@ class TestConnection:
 
     @pytest.mark.it("should return an error and raise a generic exception")
     def test_connect_db_exception(self, set_testdb_env):
-        with patch("src.db_conn.conn.Connection", side_effect=Exception()) as mock_conn:
-            with pytest.raises(Exception) as e:
+        with patch("src.db_conn.conn.Connection", side_effect=Exception()):
+            with pytest.raises(Exception):
                 connect_db()
 
     @pytest.mark.it(
@@ -36,5 +36,5 @@ class TestConnection:
         monkeypatch.delenv("DB_USER", raising=False)
         with patch("src.db_conn.conn.Connection") as mock_conn:
             mock_conn.side_effect = Exception("no user")
-            with pytest.raises(Exception) as e:
+            with pytest.raises(Exception):
                 connect_db()
