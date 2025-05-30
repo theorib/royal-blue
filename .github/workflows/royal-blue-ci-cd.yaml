@@ -46,7 +46,7 @@ jobs:
         run: uv run bandit -r -lll src
   
   deploy-terraform:
-    if: github.event_name == 'workflow_dispatch'
+    # if: github.event_name == 'workflow_dispatch'
     name: Deploy Royal Blue Terraform infrastructure
     runs-on: ubuntu-latest
     steps:
