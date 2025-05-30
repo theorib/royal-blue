@@ -17,4 +17,6 @@
     },
     "editor.defaultFormatter": "charliermarsh.ruff"
     },
+    "ruff.format.preview": true,
+    "ruff.lint.preview": true,
 }
