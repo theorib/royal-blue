@@ -66,6 +66,9 @@ jobs:
       - name: Run uv sync
         run: uv sync --frozen
 
+      - name: Create Lambda Layer bundle
+        run: uv run ./build_lambda_layer.sh
+
       - name: Install Terraform CLI
         uses: hashicorp/setup-terraform@v3
 
