@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 from psycopg import Connection, Error, connect
 from psycopg.rows import dict_row
 
-logger = logging.getLogger(__name__)
-
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def connect_db():
