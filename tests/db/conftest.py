@@ -57,7 +57,6 @@ def mock_connect(
     mock_cursor_context_manager,
 ):
     connection = MagicMock(spec=Connection)
-    connection.autocommit = True
     connection.closed = False
     connection.close.return_value = None
     connection.cursor.return_value = mock_cursor_context_manager

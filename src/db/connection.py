@@ -24,7 +24,6 @@ def connect_db():
             row_factory=dict_row,  # type: ignore
             cursor_factory=dict_row,  # type: ignore
         )
-        conn.autocommit = True
 
         return conn
     except Error as error:
