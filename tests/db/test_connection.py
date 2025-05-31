@@ -27,7 +27,6 @@ class TestConnectDb:
         patched_connect.assert_called_once_with(
             "user=user password=pass host=localhost dbname=testdb port=5432",
             row_factory=dict_row,
-            cursor_factory=dict_row,
         )
 
     # @pytest.mark.skip
