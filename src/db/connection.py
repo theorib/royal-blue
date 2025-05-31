@@ -22,7 +22,6 @@ def connect_db():
         conn = connect(
             f"user={user} password={password} host={host} dbname={dbname} port={int(port or 0000)}",
             row_factory=dict_row,  # type: ignore
-            cursor_factory=dict_row,  # type: ignore
         )
 
         return conn
