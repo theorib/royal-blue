@@ -6,7 +6,7 @@ resource "aws_sfn_state_machine" "state_machine" {
   definition = jsonencode({
     Comment = "Simple Step Function to invoke Lambda"
     StartAt = "extract"
-    States  = {
+    States = {
       extract = {
         Type     = "Task"
         Resource = var.lambda_arns["extract"]
