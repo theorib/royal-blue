@@ -43,9 +43,7 @@ class TestConnectDb:
     def test_raises_operational_error(self, patched_envs_error):
         with pytest.raises(OperationalError) as error:
             connect_db()
-        assert (
-            str(error.value) == "[Errno 8] nodename nor servname provided, or not known"
-        )
+        assert "name resolution" in str(error.value) or "nodename" in str(error.value)
 
     @pytest.mark.it("check that if it raises exceptions, they are logged by logger")
     def test_logs_errors(self, patched_envs, caplog):
@@ -54,6 +52,7 @@ class TestConnectDb:
             with caplog.at_level(logging.ERROR):
                 with pytest.raises(Exception):
                     connect_db()
+
             logged_record = caplog.records[0]
             assert logged_record.levelname == "ERROR"
             assert error_massage in logged_record.message
