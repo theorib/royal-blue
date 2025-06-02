@@ -1,7 +1,5 @@
 import logging
-import os
-from pprint import pprint
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 from psycopg import Connection, OperationalError

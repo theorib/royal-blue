@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, TypeVar, cast
+from typing import Any
 
 from dotenv import load_dotenv
 from psycopg import Connection, Error, connect
