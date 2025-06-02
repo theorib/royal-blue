@@ -1,0 +1,5 @@
+DB_HOST=dummyhost
+DB_USER=dummyuser
+DB_PASSWORD=dummypassword
+DB_DATABASE=dummydb
+DB_PORT=dummyport
