@@ -32,7 +32,7 @@ filterwarnings = "ignore::DeprecationWarning"
 line-length = 88
 
 [tool.ruff.lint]
-unfixable = ["F401"]
+extend-select = ["I"]
 
 [tool.ruff.format]
 docstring-code-format = true
