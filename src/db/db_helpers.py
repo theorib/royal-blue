@@ -44,9 +44,7 @@ def get_totesys_table_names(
 
         return {
             "success": {
-                "data": {
-                    "table_names": totesys_table_names,
-                }
+                "data": totesys_table_names
             }
         }
 
