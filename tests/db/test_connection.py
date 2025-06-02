@@ -31,7 +31,7 @@ class TestConnectDb:
     @pytest.mark.it("check that the DB connection is open")
     def test_connection_open(self, patched_connect):
         conn = connect_db()
-        assert conn.closed == False
+        assert not conn.closed
 
     # @pytest.mark.skip
     @pytest.mark.it("check that it raises an exception when connection fails")
@@ -57,7 +57,7 @@ class TestConnectDb:
     def test_logs_errors(self, patched_envs, caplog):
         error_massage = "Connection failed"
         with patch("src.db.connection.connect", side_effect=Exception(error_massage)):
-            with caplog.at_level(logging.ERROR) as log:
+            with caplog.at_level(logging.ERROR):
                 with pytest.raises(Exception):
                     connect_db()
             logged_record = caplog.records[0]
@@ -71,9 +71,9 @@ class TestCloseDb:
     @pytest.mark.it("check that it closes the DB connection")
     def test_closes_db(self, patched_connect):
         conn = connect_db()
-        assert conn.closed == False
+        assert not conn.closed
         close_db(conn)
-        assert conn.closed == True
+        assert conn.closed
 
     # @pytest.mark.skip
     @pytest.mark.it(
@@ -82,9 +82,9 @@ class TestCloseDb:
     def test_close_multiple(self, patched_connect):
         conn = connect_db()
         close_db(conn)
-        assert conn.closed == True
+        assert conn.closed
         close_db(conn)
-        assert conn.closed == True
+        assert conn.closed
 
     # @pytest.mark.skip
     @pytest.mark.it("check that if any exceptions are raised they are logged by logger")
@@ -94,8 +94,8 @@ class TestCloseDb:
             mock_connect.return_value.close.side_effect = Exception(error_message)
             conn = connect_db()
 
-            with caplog.at_level(logging.ERROR) as log:
-                with pytest.raises(Exception, match=error_message) as error:
+            with caplog.at_level(logging.ERROR):
+                with pytest.raises(Exception, match=error_message):
                     close_db(conn)
             logged_record = caplog.records[0]
             assert logged_record.levelname == "ERROR"
