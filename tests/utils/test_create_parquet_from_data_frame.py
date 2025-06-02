@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from io import BytesIO
 
@@ -48,3 +49,16 @@ class TestCreateParquetFromDataFrame:
         empty_data_frame = pd.DataFrame()
         with pytest.raises(InvalidDataFrame, match="ERROR: invalid DataFrame"):
             create_parquet_from_data_frame(empty_data_frame)
+
+    # @pytest.mark.skip
+    @pytest.mark.it("check that InvalidDataFrame exceptions get logged")
+    def test_(self, caplog):
+        empty_data_frame = pd.DataFrame()
+        error_message = "ERROR: invalid DataFrame"
+        with caplog.at_level(logging.ERROR):
+            with pytest.raises(InvalidDataFrame, match=error_message):
+                create_parquet_from_data_frame(empty_data_frame)
+
+        logged_record = caplog.records[0]
+        assert logged_record.levelname == "ERROR"
+        assert error_message in logged_record.message
