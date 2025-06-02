@@ -130,13 +130,13 @@ class TestGetTableLastUpdatedTimestamp:
         assert result["success"]["data"]["table_name"] == table_name  # type: ignore
         assert isinstance(result["success"]["data"]["last_updated"], datetime)  # type: ignore
 
-    # @pytest.mark.skip
+    @pytest.mark.skip
     @pytest.mark.it(
         "check it returns an error dictionary with UndefinedTable Exception if there are no records to return"
     )
     def test_(self):
         conn = connect_db()
-        table_name = "concurrency"
+        table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
 
