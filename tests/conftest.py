@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import boto3
 import pandas as pd
@@ -29,19 +30,44 @@ def valid_data_frame_data():
         {
             "table_name": "test_table",
             "last_updated": "2025-05-27 01:23:45.678910",
-            "data_frame": pd.DataFrame(
-                {"name": ["Charley", "Oliver"], "age": [27, 28]}
-            ),
+            "data_frame": pd.DataFrame({
+                "name": ["Charley", "Oliver"],
+                "age": [27, 28],
+            }),
         },
         {
             "table_name": "test_table_2",
             "last_updated": "2025-05-27 02:34:56.798101",
-            "data_frame": pd.DataFrame(
-                {
-                    "country": ["Lancashire", "Greater Manchester"],
-                    "city": ["Preston", "Manchester"],
-                    "road": ["Victoria", "Oxford Road"],
-                }
-            ),
+            "data_frame": pd.DataFrame({
+                "country": ["Lancashire", "Greater Manchester"],
+                "city": ["Preston", "Manchester"],
+                "road": ["Victoria", "Oxford Road"],
+            }),
         },
     ]
+
+
+@pytest.fixture(scope="module")
+def test_data_frame():
+    data_frame = pd.DataFrame([
+        {
+            "currency_id": 1,
+            "currency_code": "GBP",
+            "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+            "last_updated": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+        },
+        {
+            "currency_id": 2,
+            "currency_code": "USD",
+            "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+            "last_updated": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+        },
+        {
+            "currency_id": 3,
+            "currency_code": "EUR",
+            "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+            "last_updated": datetime.fromisoformat("2022-11-03 14:20:49.962"),
+        },
+    ])
+
+    return data_frame
