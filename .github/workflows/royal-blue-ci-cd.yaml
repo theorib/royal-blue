@@ -36,16 +36,13 @@ jobs:
       - name: Run Ruff Format
         run: uv run ruff format --verbose .
 
-      - name: Run Pytest Tests
+      - name: Run Test with Coverage
         env:
           DB_USER: ${{secrets.DB_USER}}
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
           DB_HOST: ${{secrets.DB_HOST}}
           DB_DATABASE: ${{secrets.DB_DATABASE}}
           DB_PORT: ${{secrets.DB_PORT}}
-        run: uv run pytest
-
-      - name: Run Test Coverage
         run: uv run pytest --cov=src tests/
 
       - name: Run Bandit Security Scan
