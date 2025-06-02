@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from pprint import pprint
 from typing import List
 
 from psycopg import Connection, sql
@@ -32,7 +31,7 @@ def get_totesys_table_names(
             with conn.cursor() as cursor:
                 cursor.execute(query)
                 response = cursor.fetchall()
-                pprint(response)
+
                 logger.debug(response)
 
                 totesys_table_names = [
@@ -60,7 +59,6 @@ def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str)
             with conn.cursor() as cursor:
                 cursor.execute(query)
                 response = cursor.fetchone()
-                pprint(response)
 
         if response:
             result = {
@@ -98,7 +96,6 @@ def get_table_data(
         with conn.cursor() as cursor:
             cursor.execute(query)
             db_response = cursor.fetchall()
-            pprint(db_response)
 
             result = {"success": {"data": db_response}}
 
