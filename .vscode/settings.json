@@ -8,15 +8,21 @@
         "source.fixAll.ruff": "explicit",
         "source.organizeImports.ruff": "explicit"
     },
-
     "ruff.nativeServer": "auto",
     "[python]": {
-    "editor.codeActionsOnSave": {
-        "source.fixAll": "explicit",
-        "source.organizeImports": "explicit"
-    },
-    "editor.defaultFormatter": "charliermarsh.ruff"
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "ruff.format.preview": true,
     "ruff.lint.preview": true,
+    "ruff.configuration": {
+        "lint": {
+            "unfixable": [
+                "F401"
+            ]
+        }
+    }
 }
