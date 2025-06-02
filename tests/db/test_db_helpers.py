@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import MagicMock
 
 import pytest
-from psycopg import Connection
+from psycopg import Connection, errors
 
 from src.db.connection import connect_db
 from src.db.db_helpers import (
@@ -12,6 +12,7 @@ from src.db.db_helpers import (
     get_table_last_updated_timestamp,
     get_totesys_table_names,
 )
+from src.db.error_map import ERROR_MAP
 
 
 @pytest.mark.describe("Test filter_out_values")
@@ -74,9 +75,11 @@ class TestGetTotesysTableNames:
         conn = connect_db()
 
         result = get_totesys_table_names(conn)
+        table_names = result["success"]["data"]["table_names"]
 
-        assert isinstance(result, list)
-        for item in result:
+        assert isinstance(table_names, list)
+
+        for item in table_names:
             assert isinstance(item, str)
 
     @pytest.mark.it("check that filtered out names are not in the returned list")
@@ -87,24 +90,39 @@ class TestGetTotesysTableNames:
         result = get_totesys_table_names(conn, table_names_to_filter_out)
 
         assert (
-            list(set(result).difference(table_names_to_filter_out)).sort()
-            == result.sort()
+            list(
+                set(result["success"]["data"]["table_names"]).difference(
+                    table_names_to_filter_out
+                )
+            ).sort()
+            == result["success"]["data"]["table_names"].sort()
         )
 
     @pytest.mark.it(
-        "check that if Exceptions are raised that they get logged by logger"
+        "check handles and logs all mapped psycopg exceptions properly          "
     )
-    def test_error_logging(self, caplog):
+    @pytest.mark.parametrize("error_class", list(ERROR_MAP.keys()))
+    def test_get_totesys_table_names_handles_errors(self, error_class, caplog):
         conn = MagicMock(spec=Connection)
-        error_message = "test exception"
-        conn.cursor.side_effect = Exception(error_message)
-        with caplog.at_level(logging.ERROR):
-            with pytest.raises(Exception, match=error_message):
-                get_totesys_table_names(conn)
 
-        logged_record = caplog.records[0]
-        assert logged_record.levelname == "ERROR"
-        assert error_message in logged_record.message
+        if error_class is Exception:
+            conn.cursor.side_effect = Exception("An unexpected error occurred.")
+        else:
+            conn.cursor.side_effect = error_class("error")
+
+        with caplog.at_level(logging.ERROR):
+            result = get_totesys_table_names(conn)
+
+        assert "error" in result
+        assert error_class.__name__ in result["error"]["message"]
+        assert ERROR_MAP[error_class] in result["error"]["message"]
+
+        error_logs = [
+            record.message for record in caplog.records if record.levelname == "ERROR"
+        ]
+        assert any(ERROR_MAP[error_class] in msg for msg in error_logs), (
+            "Expected log message not found"
+        )
 
 
 @pytest.mark.describe("Test get_table_last_updated_timestamp")
@@ -128,16 +146,16 @@ class TestGetTableLastUpdatedTimestamp:
         "check it returns an error dictionary with UndefinedTable Exception if there are no records to return"
     )
     def test_(self, patched_connect, mock_cursor):
-        mock_cursor.fetchone.side_effect = Exception(
-            "ERROR: Table currency does not exist."
-        )
+        mock_cursor.fetchone.side_effect = errors.UndefinedTable("ERROR")
         conn = connect_db()
         table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
 
+        assert "error" in result
         assert (
-            result["error"]["message"] == f"ERROR: Table {table_name} does not exist."
+            result["error"]["message"]
+            == "UndefinedTable: Table does not exist in the database."
         )
 
     @pytest.mark.it(
@@ -150,5 +168,5 @@ class TestGetTableLastUpdatedTimestamp:
 
         result = get_table_last_updated_timestamp(conn, table_name)
 
-        assert "error" in result
+        assert result.get("error")
         assert result["error"]["message"] == "invalid database response"
