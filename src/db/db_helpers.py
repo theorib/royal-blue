@@ -27,20 +27,19 @@ def get_totesys_table_names(
     """
 
     try:
-        with conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-                response = cursor.fetchall()
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            response = cursor.fetchall()
 
-                logger.debug(response)
+            logger.debug(response)
 
-                totesys_table_names = [
-                    item["table_name"]
-                    for item in response
-                    # filter out tables that should not be
-                    if item["table_name"] not in table_names_to_filter_out
-                ]
-                logger.debug(totesys_table_names)
+            totesys_table_names = [
+                item["table_name"]
+                for item in response
+                # filter out tables that should not be
+                if item["table_name"] not in table_names_to_filter_out
+            ]
+            logger.debug(totesys_table_names)
 
         return {"success": {"data": totesys_table_names}}
 
@@ -54,10 +53,9 @@ def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str)
             "SELECT MAX(last_updated) as last_updated FROM public.{}"
         ).format(sql.Identifier(table_name))
 
-        with conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-                response = cursor.fetchone()
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            response = cursor.fetchone()
 
         if response and response["last_updated"] is not None:
             return {
@@ -92,12 +90,13 @@ def get_table_data(
         else:
             query = base_query
 
-        with conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-                db_response = cursor.fetchall()
+        with conn.cursor() as cursor:
+            cursor.execute(query)
+            db_response = cursor.fetchall()
 
-        return {"success": {"data": db_response}}
+            result = {"success": {"data": db_response}}
+
+        return result
 
     except Exception as e:
         return handle_db_exception(e)
