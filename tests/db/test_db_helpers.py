@@ -16,7 +16,6 @@ from src.db.db_helpers import (
 
 @pytest.mark.describe("Test filter_out_values")
 class TestFilterOutValues:
-    # @pytest.mark.skip
     @pytest.mark.it("check for purity")
     def test_purity(self):
         test_table_names = ["a", "b", "c"]
@@ -27,7 +26,6 @@ class TestFilterOutValues:
         assert result is not test_table_names
         assert result is not test_filtered_names
 
-    # @pytest.mark.skip
     @pytest.mark.it("check for argument mutation")
     def test_(self):
         test_table_names = ["a", "b", "c"]
@@ -40,7 +38,6 @@ class TestFilterOutValues:
         assert test_table_names == test_table_names_value_ref
         assert test_filtered_names == test_filtered_names_value_ref
 
-    # @pytest.mark.skip
     @pytest.mark.it("check that if passed an empty list it returns an empty list")
     def test_empty_list(self):
         test_table_names = []
@@ -49,7 +46,6 @@ class TestFilterOutValues:
         result = filter_out_values(test_table_names, test_filtered_names)
         assert result == []
 
-    # @pytest.mark.skip
     @pytest.mark.it(
         "check that if passed a list with no filterable values, no values are filtered"
     )
@@ -61,7 +57,6 @@ class TestFilterOutValues:
 
         assert result == test_table_names
 
-    # @pytest.mark.skip
     @pytest.mark.it("check that it returns a list with filtered names removed")
     def test_remove_filtered(self):
         test_table_names = ["a", "b", "c"]
@@ -74,9 +69,8 @@ class TestFilterOutValues:
 
 @pytest.mark.describe("Test get_totesys_table_names")
 class TestGetTotesysTableNames:
-    # @pytest.mark.skip
     @pytest.mark.it("check that it returns a list of strings")
-    def test_returns_list_str(self):
+    def test_returns_list_str(self, patched_connect):
         conn = connect_db()
 
         result = get_totesys_table_names(conn)
@@ -85,9 +79,8 @@ class TestGetTotesysTableNames:
         for item in result:
             assert isinstance(item, str)
 
-    # @pytest.mark.skip
     @pytest.mark.it("check that filtered out names are not in the returned list")
-    def test_filtered_values(self):
+    def test_filtered_values(self, patched_connect):
         conn = connect_db()
         table_names_to_filter_out = ["_prisma_migrations"]
 
@@ -98,7 +91,6 @@ class TestGetTotesysTableNames:
             == result.sort()
         )
 
-    # @pytest.mark.skip
     @pytest.mark.it(
         "check that if Exceptions are raised that they get logged by logger"
     )
@@ -117,24 +109,28 @@ class TestGetTotesysTableNames:
 
 @pytest.mark.describe("Test get_table_last_updated_timestamp")
 class TestGetTableLastUpdatedTimestamp:
-    # @pytest.mark.skip
     @pytest.mark.it(
         "check that it returns the latest updated timestamp of table currency"
     )
-    def test_returns_timestamp(self):
+    def test_returns_timestamp(self, patched_connect, mock_cursor):
+        mock_cursor.fetchone.return_value = {
+            "last_updated": datetime(2025, 5, 1, 12, 30)
+        }
         conn = connect_db()
         table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
 
-        assert result["success"]["data"]["table_name"] == table_name  # type: ignore
-        assert isinstance(result["success"]["data"]["last_updated"], datetime)  # type: ignore
+        assert result["success"]["data"]["table_name"] == table_name
+        assert isinstance(result["success"]["data"]["last_updated"], datetime)
 
-    @pytest.mark.skip
     @pytest.mark.it(
         "check it returns an error dictionary with UndefinedTable Exception if there are no records to return"
     )
-    def test_(self):
+    def test_(self, patched_connect, mock_cursor):
+        mock_cursor.fetchone.side_effect = Exception(
+            "ERROR: Table currency does not exist."
+        )
         conn = connect_db()
         table_name = "currency"
 
@@ -144,9 +140,15 @@ class TestGetTableLastUpdatedTimestamp:
             result["error"]["message"] == f"ERROR: Table {table_name} does not exist."
         )
 
-    @pytest.mark.skip
     @pytest.mark.it(
         "check it returns an error dictionary if there are no records to return"
     )
-    def test_no(self):
-        pass
+    def test_no(self, patched_connect, mock_cursor):
+        mock_cursor.fetchone.return_value = {"last_updated": None}
+        conn = connect_db()
+        table_name = "currency"
+
+        result = get_table_last_updated_timestamp(conn, table_name)
+
+        assert "error" in result
+        assert result["error"]["message"] == "invalid database response"

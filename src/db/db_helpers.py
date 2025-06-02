@@ -59,9 +59,10 @@ def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str)
             with conn.cursor() as cursor:
                 cursor.execute(query)
                 response = cursor.fetchone()
+        print(response)
 
-        if response:
-            result = {
+        if response["last_updated"] is not None:
+            return {
                 "success": {
                     "data": {
                         "table_name": table_name,
@@ -69,13 +70,13 @@ def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str)
                     }
                 }
             }
-            return result
+
         return {"error": {"message": "invalid database response"}}
-    except Exception as error:
+    except Exception as e:
         # create error lookup table and use it to display the correct error messages
 
-        logger.error(error)
-        raise error
+        logger.error(e)
+        return {"error": {"message": str(e)}}
 
 
 def get_table_data(
