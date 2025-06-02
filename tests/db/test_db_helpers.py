@@ -106,7 +106,7 @@ class TestGetTotesysTableNames:
         conn = MagicMock(spec=Connection)
         error_message = "test exception"
         conn.cursor.side_effect = Exception(error_message)
-        with caplog.at_level(logging.ERROR) as log:
+        with caplog.at_level(logging.ERROR):
             with pytest.raises(Exception, match=error_message):
                 get_totesys_table_names(conn)
 
