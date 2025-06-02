@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 
 import pandas as pd
@@ -49,26 +50,24 @@ def create_parquets_from_data_frames(data: list):
     parquet_files = []
 
     for table in data:
-        table_name = table.get("table_name")
-        last_updated = table.get("last_updated")
+        table_name: str = table.get("table_name")
+        last_updated: datetime = table.get("last_updated")
         data_frame = table.get("data_frame")
 
         if not isinstance(data_frame, pd.DataFrame):
             return {"error": {"message": f"{table_name}: invalid data type."}}
 
-        buffer = BytesIO()
+        buffer: BytesIO = BytesIO()
 
         try:
             data_frame.to_parquet(buffer, engine="pyarrow", compression="gzip")
             buffer.seek(0)
 
-            parquet_files.append(
-                {
-                    "table_name": table_name,
-                    "last_updated": last_updated,
-                    "parquet_file": buffer,
-                }
-            )
+            parquet_files.append({
+                "table_name": table_name,
+                "last_updated": last_updated,
+                "parquet_file": buffer,
+            })
         except Exception as err:
             return {"error": {"message": f"{table_name}: {err}"}}
 
