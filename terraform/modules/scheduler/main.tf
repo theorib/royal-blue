@@ -6,8 +6,8 @@ resource "aws_scheduler_schedule" "schedule" {
     mode = "OFF"
   }
 
-  schedule_expression = var.schedule_expression
-  schedule_expression_timezone = var.schedule_timezone 
+  schedule_expression          = var.schedule_expression
+  schedule_expression_timezone = var.schedule_timezone
 
   target {
     arn      = var.state_machine_arn

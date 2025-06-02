@@ -20,8 +20,8 @@ resource "aws_iam_role_policy" "scheduler_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Effect = "Allow",
-      Action = "states:StartExecution",
+      Effect   = "Allow",
+      Action   = "states:StartExecution",
       Resource = var.state_machine_arn
     }]
   })
