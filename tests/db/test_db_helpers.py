@@ -75,7 +75,7 @@ class TestGetTotesysTableNames:
         conn = connect_db()
 
         result = get_totesys_table_names(conn)
-        table_names = result["success"]["data"]["table_names"]
+        table_names = result["success"]["data"]
 
         assert isinstance(table_names, list)
 
@@ -91,11 +91,9 @@ class TestGetTotesysTableNames:
 
         assert (
             list(
-                set(result["success"]["data"]["table_names"]).difference(
-                    table_names_to_filter_out
-                )
+                set(result["success"]["data"]).difference(table_names_to_filter_out)
             ).sort()
-            == result["success"]["data"]["table_names"].sort()
+            == result["success"]["data"].sort()
         )
 
     @pytest.mark.it(

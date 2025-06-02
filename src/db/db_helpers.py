@@ -42,11 +42,7 @@ def get_totesys_table_names(
                 ]
                 logger.debug(totesys_table_names)
 
-        return {
-            "success": {
-                "data": totesys_table_names
-            }
-        }
+        return {"success": {"data": totesys_table_names}}
 
     except Exception as e:
         return handle_db_exception(e)
