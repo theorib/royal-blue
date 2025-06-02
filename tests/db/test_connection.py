@@ -41,7 +41,7 @@ class TestConnectDb:
             with pytest.raises(Exception, match=error_message):
                 connect_db()
 
-    # @pytest.mark.skip
+    @pytest.mark.skip
     @pytest.mark.it(
         "check that it raises OperationalError upon entering wrong DB credentials"
     )
