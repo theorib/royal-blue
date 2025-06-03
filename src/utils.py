@@ -63,13 +63,11 @@ def create_parquets_from_data_frames(data: list):
             data_frame.to_parquet(buffer, engine="pyarrow", compression="gzip")
             buffer.seek(0)
 
-            parquet_files.append(
-                {
-                    "table_name": table_name,
-                    "last_updated": last_updated,
-                    "parquet_file": buffer,
-                }
-            )
+            parquet_files.append({
+                "table_name": table_name,
+                "last_updated": last_updated,
+                "parquet_file": buffer,
+            })
         except Exception as err:
             return {"error": {"message": f"{table_name}: {err}"}}
 
@@ -195,7 +193,7 @@ def add_to_s3_bucket(client, bucket_name, key, body):
             "BucketAlreadyOwnedByYou": "You already own this bucket.",
         }
         message = error_map.get(code)
-        return {"error": {"message": f"{code}: {message}"}}
+        return {"error": {"message": f"{code}: {message}", "raw_response": err}}
 
-    except Exception as ex:
-        return {"error": {"message": f"{str(ex)}"}}
+    except Exception as err:
+        return {"error": {"message": f"{str(err)}", "raw_response": err}}
