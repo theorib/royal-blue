@@ -62,7 +62,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
     conn = connect_db()
     s3_client = boto3.client("s3")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
-    LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
+    # LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
 
     # get current_state
     # if current_state file does not exist INITIALIZE STATE
