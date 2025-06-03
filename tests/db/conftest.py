@@ -16,9 +16,9 @@ def patched_envs(monkeypatch):
 
 @pytest.fixture(scope="function")
 def patched_envs_error(monkeypatch):
-    monkeypatch.setenv("DB_USER", None)
+    monkeypatch.setenv("DB_USER", "invalid")
     monkeypatch.setenv("DB_PASSWORD", "pass")
-    monkeypatch.setenv("DB_HOST", None)
+    monkeypatch.setenv("DB_HOST", "invalid_host")
     monkeypatch.setenv("DB_DATABASE", "testdb")
     monkeypatch.setenv("DB_PORT", "5432")
 
