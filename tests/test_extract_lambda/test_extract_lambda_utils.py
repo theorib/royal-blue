@@ -4,6 +4,7 @@ from datetime import datetime
 import pandas as pd
 import pytest
 
+from src.lambdas.extract_lambda.custom_errors import InvalidList
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
     get_last_updated_from_raw_table_data,
@@ -16,10 +17,9 @@ class TestCreateDataFramFromList:
     @pytest.mark.it(
         "check for purity, making sure it returns a different object than the one passed as argument"
     )
-    def test_purity(self):
-        test_list = []
-        result = create_data_frame_from_list(test_list)
-        assert result is not test_list
+    def test_purity(self, test_table_data_list):
+        result = create_data_frame_from_list(test_table_data_list)
+        assert result is not test_table_data_list
 
     # @pytest.mark.skip
     @pytest.mark.it("check for mutation")
@@ -37,11 +37,11 @@ class TestCreateDataFramFromList:
         assert test_table_data == test_table_data_value_ref
 
     # @pytest.mark.skip
-    @pytest.mark.it("check that it returns None if empty list is passed")
+    @pytest.mark.it("check that it raises an Exception if an empty list is passed")
     def test_empty_list(self):
         test_list = []
-        result = create_data_frame_from_list(test_list)
-        assert result is None
+        with pytest.raises(InvalidList):
+            create_data_frame_from_list(test_list)
 
     # @pytest.mark.skip
     @pytest.mark.it(
@@ -107,11 +107,11 @@ class TestGetLastUpdatedFromRawTableData:
         get_last_updated_from_raw_table_data(test_table_data)
         assert test_table_data == test_table_data_value_ref
 
-    @pytest.mark.it("check it returns none when passed an empty list")
+    @pytest.mark.it("check it raises an, InvalidList exception if passed an empty list")
     def test_empty_list(self):
         test_list = []
-
-        assert get_last_updated_from_raw_table_data(test_list) is None
+        with pytest.raises(InvalidList, match="ERROR: List is empty"):
+            get_last_updated_from_raw_table_data(test_list)
 
     @pytest.mark.it("check it returns a datetime for list of one dictionary")
     def test_datetime_return(self):
