@@ -2,5 +2,5 @@ class InvalidDataFrame(Exception):
     pass
 
 
-class InvalidList(Exception):
+class InvalidEmptyList(Exception):
     pass

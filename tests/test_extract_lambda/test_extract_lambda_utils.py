@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 import pytest
 
-from src.lambdas.extract_lambda.custom_errors import InvalidList
+from src.lambdas.extract_lambda.custom_errors import InvalidEmptyList
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
     get_last_updated_from_raw_table_data,
@@ -40,7 +40,7 @@ class TestCreateDataFramFromList:
     @pytest.mark.it("check that it raises an Exception if an empty list is passed")
     def test_empty_list(self):
         test_list = []
-        with pytest.raises(InvalidList):
+        with pytest.raises(InvalidEmptyList):
             create_data_frame_from_list(test_list)
 
     # @pytest.mark.skip
@@ -107,10 +107,10 @@ class TestGetLastUpdatedFromRawTableData:
         get_last_updated_from_raw_table_data(test_table_data)
         assert test_table_data == test_table_data_value_ref
 
-    @pytest.mark.it("check it raises an, InvalidList exception if passed an empty list")
+    @pytest.mark.it("check it raises an exception if passed an empty list")
     def test_empty_list(self):
         test_list = []
-        with pytest.raises(InvalidList, match="ERROR: List is empty"):
+        with pytest.raises(InvalidEmptyList, match="ERROR: List is empty"):
             get_last_updated_from_raw_table_data(test_list)
 
     @pytest.mark.it("check it returns a datetime for list of one dictionary")
