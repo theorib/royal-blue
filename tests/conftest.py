@@ -48,8 +48,8 @@ def valid_data_frame_data():
 
 
 @pytest.fixture(scope="module")
-def test_data_frame():
-    data_frame = pd.DataFrame([
+def test_table_data_list():
+    return [
         {
             "currency_id": 1,
             "currency_code": "GBP",
@@ -68,6 +68,11 @@ def test_data_frame():
             "created_at": datetime.fromisoformat("2022-11-03 14:20:49.962"),
             "last_updated": datetime.fromisoformat("2022-11-03 14:20:49.962"),
         },
-    ])
+    ]
+
+
+@pytest.fixture(scope="module")
+def test_data_frame(test_table_data_list):
+    data_frame = pd.DataFrame(test_table_data_list)
 
     return data_frame
