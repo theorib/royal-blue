@@ -19,7 +19,7 @@ def filter_out_values(values: List[str], values_to_filter: List[str]):
 def get_totesys_table_names(
     conn: Connection[DictRow],
     table_names_to_filter_out: List[str] = ["_prisma_migrations"],
-):
+) -> List[dict]:
     query = """
         SELECT table_name
           FROM information_schema.tables
@@ -39,9 +39,8 @@ def get_totesys_table_names(
                 # filter out tables that should not be
                 if item["table_name"] not in table_names_to_filter_out
             ]
-            logger.debug(totesys_table_names)
 
-        return {"success": {"data": totesys_table_names}}
+        return totesys_table_names
 
     except Exception as e:
         return handle_db_exception(e)
@@ -87,6 +86,7 @@ def get_table_data(
             )
 
             query = base_query + query_with_last_updated
+
         else:
             query = base_query
 
