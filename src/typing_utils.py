@@ -5,7 +5,6 @@ class EmptyDict(TypedDict):
     pass
 
 
-
 # name of bucket will come from an environment variable
 # LAMBDA_STATE_BUCKET_NAME
 # file_name = lambda_state.json

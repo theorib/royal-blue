@@ -11,26 +11,22 @@ host = os.getenv("DB_HOST")
 database = os.getenv("DB_DATABASE")
 port = os.getenv("DB_PORT")
 
-def connect_db(): 
-    try:
 
+def connect_db():
+    try:
         conn = pg8000.dbapi.Connection(
-        database=database,
-        user=user,
-        password=password,
-        host=host,
-        port=port
+            database=database, user=user, password=password, host=host, port=port
         )
-        
+
         return conn
-        
+
     except Exception as e:
         return {
-                "error": {
+            "error": {
                 "message": f"Error {e}",
-  }
-}
-    
+            }
+        }
+
 
 def close_db(conn: pg8000.dbapi.Connection):
     try:
@@ -39,9 +35,7 @@ def close_db(conn: pg8000.dbapi.Connection):
             print("CONNECTION CLOSED")
     except Exception as e:
         return {
-                "error": {
+            "error": {
                 "message": f"Error {e}",
-  }
-}
-
-
+            }
+        }
