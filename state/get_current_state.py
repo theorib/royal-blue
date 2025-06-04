@@ -22,7 +22,8 @@ def get_current_state(s3_client, bucket_name):
                 "data": json.loads(content["success"]["data"])
             }       
         }
-    
+    # return empty {"ingest_state": {}}
+
     except ClientError as e:
           if e.response["Error"]["Code"] == "NoSuchKey":
               return {
@@ -36,4 +37,3 @@ def get_current_state(s3_client, bucket_name):
                    "message": f"Invalid JSON in {key}: {e}"
               }
          }
-

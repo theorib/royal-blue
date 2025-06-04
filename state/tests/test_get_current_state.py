@@ -1,5 +1,63 @@
-# Test returns correct message for other s3 errors (ClientErrors from get file)
-# Test returns python dict with the same variables
-# Test returns correct error message for non-exsistent json (nosuchkey)
-# Test returns correct error message for invalid json (decoder)
+import json
 
+import boto3
+import pytest
+from moto import mock_aws
+
+from state.get_current_state import get_current_state
+
+
+@pytest.fixture
+def s3_fixture():
+    with mock_aws():
+        s3 = boto3.client("s3", region_name="eu-west-2")
+        bucket = "test-bucket"
+        s3.create_bucket(
+            Bucket=bucket,
+            CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
+        )
+        yield s3, bucket
+
+
+@pytest.mark.describe("get_current_state Behavior")
+@mock_aws
+class TestGetCurrentState:
+
+    @pytest.mark.it("Returns a Python dict with expected variables on success")
+    def test_get_current_state_success(self, s3_fixture):
+        s3, bucket = s3_fixture
+        mock_state = {"ingest_state": [{"table_name":"test_table"}]}
+
+        s3.put_object(
+            Bucket=bucket,
+            Key ="lambda_state.json",
+            Body=json.dumps(mock_state).encode("utf-8")
+            )
+        
+        result = get_current_state(s3, bucket)
+        assert "success" in result
+        assert isinstance(result["success"]["data"], dict)
+        assert result["success"]["data"]["ingest_state"][0]["table_name"] == "test_table"
+
+    @pytest.mark.it("Returns correct error message for non-existent JSON (NoSuchKey")
+    def test_get_current_state_NoSuchKey_error(self, s3_fixture):
+        s3, bucket = s3_fixture
+
+        result = get_current_state(s3, bucket)
+        assert "error" in result
+        assert "NoSuchKey" in result["error"]["message"]
+
+    @pytest.mark.it("Returns correct error message for invalid JSON (decoder)")
+    def test_invalid_json_decode(self, s3_fixture):
+        s3, bucket = s3_fixture
+
+        s3.put_object(
+            Bucket=bucket,
+            Key ="lambda_state.json",
+            Body="hello"
+            )
+        
+        result = get_current_state(s3, bucket)
+        assert "error" in result
+        assert "Invalid JSON" in result["error"]["message"]
+    
