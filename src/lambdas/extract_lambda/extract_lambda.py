@@ -69,36 +69,42 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
     # get current_state
     # if current_state file does not exist INITIALIZE STATE
 
-    # open db connection context manager
-    with conn:
-        totesys_tables = get_totesys_table_names(conn)
+    try:
+        with conn:
+            totesys_tables = get_totesys_table_names(conn)
 
-        result = {"files_to_process": []}
+            result = {"files_to_process": []}
 
-        for table_name in totesys_tables:
-            # TODO Logging starting the loop????
+            for table_name in totesys_tables:
+                # TODO Logging starting the loop????
 
-            current_state = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
+                current_state = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
 
-            # TODO encapsulate this into a function
-            # initialize_table_state(current_state, table_name)
-            # should return the updated state or if the table state was already there, leave it untouched and return it
-            if not current_state["ingest_state"].get(table_name):
-                current_state["ingest_state"][table_name] = {
-                    "last_updated": None,
-                    "ingest_log": [],
-                }
+                # TODO encapsulate this into a function
+                # initialize_table_state(current_state, table_name)
+                # should return the updated state or if the table state was already there, leave it untouched and return it
+                if not current_state["ingest_state"].get(table_name):
+                    current_state["ingest_state"][table_name] = {
+                        "last_updated": None,
+                        "ingest_log": [],
+                    }
 
-            current_state_last_updated: datetime | None = current_state["ingest_state"][
-                table_name
-            ]["last_updated"]
+                current_state_last_updated: datetime | None = current_state[
+                    "ingest_state"
+                ][table_name]["last_updated"]
 
-            db_response = get_table_data(conn, table_name, current_state_last_updated)  # type: ignore
+                db_response = get_table_data(
+                    conn, table_name, current_state_last_updated
+                )  # type: ignore
 
-            # TODO Logging this????
-            extraction_timestamp = datetime.now()
+                if db_response.get("error"):
+                    raise Exception(db_response["error"]["message"])
+                if not len(db_response["success"]["data"]):
+                    continue
 
-            if db_response.get("success") and len(db_response["success"]["data"]):
+                # TODO Logging this????
+                extraction_timestamp = datetime.now()
+
                 table_data = db_response["success"]["data"]
 
                 new_table_data_last_updated: datetime = (
@@ -160,7 +166,10 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                     updated_state_all, LAMBDA_STATE_BUCKET_NAME, s3_client
                 )
 
-        return result
+            return result
+    except Exception as err:
+        logger.critical(err)
+        raise err
 
 
 if __name__ == "__main__":
