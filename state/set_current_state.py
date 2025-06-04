@@ -1,8 +1,3 @@
-# set_current_state(current_state:dict)
-# connect to s3
-# convert current_state to json
-# create a json file in s3 with specific name
-
 import json
 
 from botocore.exceptions import ClientError

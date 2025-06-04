@@ -14,7 +14,14 @@ def get_current_state(s3_client, bucket_name):
 
     try:
         content = get_file_from_s3_bucket(s3_client, bucket_name, key)
-        return json.loads(content)
+        if "error" in content:
+            return content
+        return {
+            "success": {
+                "message": f"{key} read from S3",
+                "data": json.loads(content["success"]["data"])
+            }       
+        }
     
     except ClientError as e:
           if e.response["Error"]["Code"] == "NoSuchKey":
