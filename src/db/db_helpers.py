@@ -81,7 +81,7 @@ def get_table_data(
         )
 
         if last_updated:
-            query_with_last_updated = sql.SQL("WHERE last_updated >= {}").format(
+            query_with_last_updated = sql.SQL("WHERE last_updated > {}").format(
                 sql.Literal(last_updated)
             )
 

@@ -88,13 +88,13 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                     "last_updated": None,
                     "ingest_log": [],
                 }
-            # print(current_state)
 
             current_state_last_updated: datetime | None = current_state["ingest_state"][
                 table_name
             ]["last_updated"]
 
             db_response = get_table_data(conn, table_name, current_state_last_updated)  # type: ignore
+
             # TODO Logging this????
             extraction_timestamp = datetime.now()
 
@@ -145,19 +145,20 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
                 result["files_to_process"].append(new_state_log_entry)
 
-            #     # ! CHANGE THIS TO CALLING THE SET STATE FUNCTION
-            # # update state
-            updated_state_all = deepcopy(current_state)
-            updated_state_all["ingest_state"][table_name]["last_updated"] = (
-                #  TODO THEO check unbound error when not ignoring types
-                new_table_data_last_updated  # type: ignore
-            )
-            updated_state_all["ingest_state"][table_name]["ingest_log"].append(
-                new_state_log_entry  # type: ignore
-            )
+                #     # ! CHANGE THIS TO CALLING THE SET STATE FUNCTION
+                # # update state
+                updated_state_all = deepcopy(current_state)
+                updated_state_all["ingest_state"][table_name]["last_updated"] = (
+                    #  TODO THEO check unbound error when not ignoring types
+                    new_table_data_last_updated  # type: ignore
+                )
+                updated_state_all["ingest_state"][table_name]["ingest_log"].append(
+                    new_state_log_entry  # type: ignore
+                )
 
-            # pprint(updated_state_all)
-            set_current_state(updated_state_all, LAMBDA_STATE_BUCKET_NAME, s3_client)
+                set_current_state(
+                    updated_state_all, LAMBDA_STATE_BUCKET_NAME, s3_client
+                )
 
         return result
 
