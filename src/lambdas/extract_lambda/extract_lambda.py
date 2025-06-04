@@ -8,15 +8,15 @@ import boto3
 
 from src.db.connection import connect_db
 from src.db.db_helpers import get_table_data, get_totesys_table_names
-from src.lambdas.extract_lambda.create_parquet_from_data_frame import (
-    create_parquet_from_data_frame,
-)
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
     get_last_updated_from_raw_table_data,
 )
-from src.typing_utils import EmptyDict
-from src.utils import add_to_s3_bucket
+from src.utilities.parquets.create_parquet_from_data_frame import (
+    create_parquet_from_data_frame,
+)
+from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
+from src.utilities.typing_utils import EmptyDict
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -88,7 +88,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 table_name
             ]["last_updated"]
 
-            db_response = get_table_data(conn, table_name, current_state_last_updated)
+            db_response = get_table_data(conn, table_name, current_state_last_updated)  # type: ignore
             extraction_timestamp = datetime.now()
 
             if db_response.get("success") and len(db_response["success"]["data"]):
@@ -111,7 +111,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 # 2025/06/13/currency_2025-06-13_10-35-20_012023.parquet
                 key = f"{year}/{month}/{day}/{filename}"
 
-                response = add_to_s3_bucket(
+                response = add_file_to_s3_bucket(
                     s3_client, INGEST_ZONE_BUCKET_NAME, key, parquet_file
                 )
 

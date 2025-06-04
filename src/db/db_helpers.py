@@ -43,7 +43,7 @@ def get_totesys_table_names(
         return totesys_table_names
 
     except Exception as e:
-        return handle_db_exception(e)
+        return handle_db_exception(e)  # type: ignore
 
 
 def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str):
