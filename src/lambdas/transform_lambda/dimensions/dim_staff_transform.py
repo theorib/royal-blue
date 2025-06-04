@@ -49,7 +49,7 @@ def dim_staff_dataframe(extracted_dataframes: dict):
             'location',
             'email_address'
         ]]
-        print(dim_staff)
+        
         return dim_staff
     except Exception as e:
         raise e
