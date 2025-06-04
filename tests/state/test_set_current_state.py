@@ -4,7 +4,7 @@ import boto3
 import pytest
 from moto import mock_aws
 
-from state.set_current_state import set_current_state
+from src.utilities.state.set_current_state import set_current_state
 
 
 @pytest.mark.describe("set_current_state Behaviour")
