@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 
 import pandas as pd
@@ -49,14 +50,14 @@ def create_parquets_from_data_frames(data: list):
     parquet_files = []
 
     for table in data:
-        table_name = table.get("table_name")
-        last_updated = table.get("last_updated")
+        table_name: str = table.get("table_name")
+        last_updated: datetime = table.get("last_updated")
         data_frame = table.get("data_frame")
 
         if not isinstance(data_frame, pd.DataFrame):
             return {"error": {"message": f"{table_name}: invalid data type."}}
 
-        buffer = BytesIO()
+        buffer: BytesIO = BytesIO()
 
         try:
             data_frame.to_parquet(buffer, engine="pyarrow", compression="gzip")
@@ -194,7 +195,7 @@ def add_to_s3_bucket(client, bucket_name, key, body):
             "BucketAlreadyOwnedByYou": "You already own this bucket.",
         }
         message = error_map.get(code)
-        return {"error": {"message": f"{code}: {message}"}}
+        return {"error": {"message": f"{code}: {message}", "raw_response": err}}
 
-    except Exception as ex:
-        return {"error": {"message": f"{str(ex)}"}}
+    except Exception as err:
+        return {"error": {"message": f"{str(err)}", "raw_response": err}}
