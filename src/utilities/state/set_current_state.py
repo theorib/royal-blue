@@ -1,5 +1,6 @@
-import json
 import logging
+
+import orjson
 
 from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 
@@ -13,7 +14,7 @@ def set_current_state(
     Converts the given dictionary to JSON and uploads it to S3 as lambda_state.json.
     """
     try:
-        json_data = json.dumps(current_state)
+        json_data = orjson.dumps(current_state)
         result = add_file_to_s3_bucket(s3_client, bucket_name, file_name, json_data)
 
         if result.get("error"):
