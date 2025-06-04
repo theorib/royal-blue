@@ -16,6 +16,8 @@ from src.utilities.parquets.create_parquet_from_data_frame import (
     create_parquet_from_data_frame,
 )
 from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
+from src.utilities.state.get_current_state import get_current_state
+from src.utilities.state.set_current_state import set_current_state
 from src.utilities.typing_utils import EmptyDict
 
 logger = logging.getLogger(__name__)
@@ -62,7 +64,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
     conn = connect_db()
     s3_client = boto3.client("s3")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
-    # LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
+    LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
 
     # get current_state
     # if current_state file does not exist INITIALIZE STATE
@@ -74,21 +76,26 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
         result = {"files_to_process": []}
 
         for table_name in totesys_tables:
-            # ! CHANGE THIS TO CALLING GET STATE FUNCTION
-            current_state = {"ingest_state": {}}
-            # this should be it's own function (get_table_state(state, table_name))
+            # TODO Logging starting the loop????
 
-            if not current_state.get("ingest_state", {}).get(table_name):
+            current_state = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
+
+            # TODO encapsulate this into a function
+            # initialize_table_state(current_state, table_name)
+            # should return the updated state or if the table state was already there, leave it untouched and return it
+            if not current_state["ingest_state"].get(table_name):
                 current_state["ingest_state"][table_name] = {
                     "last_updated": None,
                     "ingest_log": [],
                 }
+            # print(current_state)
 
             current_state_last_updated: datetime | None = current_state["ingest_state"][
                 table_name
             ]["last_updated"]
 
             db_response = get_table_data(conn, table_name, current_state_last_updated)  # type: ignore
+            # TODO Logging this????
             extraction_timestamp = datetime.now()
 
             if db_response.get("success") and len(db_response["success"]["data"]):
@@ -101,6 +108,12 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 table_df = create_data_frame_from_list(table_data)
                 parquet_file = create_parquet_from_data_frame(table_df)
 
+                # TODO encapsulate creating file names and keys into a function
+                # create_parquet_metadata(last_updated:datetime, table_name:str)
+                # returns (
+                # filename,
+                # key
+                # )
                 year = new_table_data_last_updated.year
                 month = new_table_data_last_updated.month
                 day = new_table_data_last_updated.day
@@ -115,8 +128,9 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                     s3_client, INGEST_ZONE_BUCKET_NAME, key, parquet_file
                 )
 
+                # ! REVIEW
                 if response.get("error"):
-                    logger.error(response["error"]["message"])
+                    # logger.error(response["error"]["message"])
                     raise response["error"]["raw_response"]  # type: ignore
 
                 new_state_log_entry = (
@@ -131,19 +145,19 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
                 result["files_to_process"].append(new_state_log_entry)
 
-                # ! CHANGE THIS TO CALLING THE SET STATE FUNCTION
-                # update state
-                updated_state_all = deepcopy(current_state)
-                updated_state_all["ingest_state"][table_name]["last_updated"] = (
-                    new_table_data_last_updated
-                )
-                updated_state_all["ingest_state"][table_name]["ingest_log"].append(
-                    new_state_log_entry
-                )
+            #     # ! CHANGE THIS TO CALLING THE SET STATE FUNCTION
+            # # update state
+            updated_state_all = deepcopy(current_state)
+            updated_state_all["ingest_state"][table_name]["last_updated"] = (
+                #  TODO THEO check unbound error when not ignoring types
+                new_table_data_last_updated  # type: ignore
+            )
+            updated_state_all["ingest_state"][table_name]["ingest_log"].append(
+                new_state_log_entry  # type: ignore
+            )
 
-                # !! upload updated_state_all to s3
-
-                # update results
+            # pprint(updated_state_all)
+            set_current_state(updated_state_all, LAMBDA_STATE_BUCKET_NAME, s3_client)
 
         return result
 
