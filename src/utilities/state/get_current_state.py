@@ -3,7 +3,7 @@ import logging
 
 from botocore.exceptions import ClientError
 
-from src.utils import get_file_from_s3_bucket
+from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
 
 logger = logging.getLogger(__name__)
 

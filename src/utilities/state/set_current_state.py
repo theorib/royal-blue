@@ -1,7 +1,7 @@
 import json
 import logging
 
-from src.utils import add_to_s3_bucket
+from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ def set_current_state(
     """
     try:
         json_data = json.dumps(current_state)
-        result = add_to_s3_bucket(s3_client, bucket_name, file_name, json_data)
+        result = add_file_to_s3_bucket(s3_client, bucket_name, file_name, json_data)
 
         if result.get("error"):
             logger.error(f"Failed to update state in S3: {result['error']}")

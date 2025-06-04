@@ -4,7 +4,7 @@ import pytest
 from botocore.exceptions import ClientError
 from moto import mock_aws
 
-from src.utils import add_to_s3_bucket
+from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 
 
 @pytest.mark.describe("add_to_s3_bucket Utility Function Behaviour")
@@ -22,7 +22,7 @@ class TestS3AddFunctionality:
             Bucket="test-bucket",
             CreateBucketConfiguration={"LocationConstraint": "eu-west-2"},
         )
-        response = add_to_s3_bucket(
+        response = add_file_to_s3_bucket(
             client=s3_client, bucket_name=bucket, key=key, body=body
         )
 
@@ -56,7 +56,7 @@ class TestS3AddFunctionality:
             operation_name="PutObject",
         )
 
-        response = add_to_s3_bucket(
+        response = add_file_to_s3_bucket(
             client=mock_client, bucket_name=bucket, key=key, body=body
         )
 
