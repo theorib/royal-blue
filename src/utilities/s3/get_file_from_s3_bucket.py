@@ -1,7 +1,9 @@
 from botocore.exceptions import ClientError
 
+from src.utilities.s3.s3_error_map import s3_error_map
 
-def get_file_from_s3_bucket(client, bucket_name, key):
+
+def get_file_from_s3_bucket(client, bucket_name, key, error_map=s3_error_map):
     """Retrieves a file object from the specified S3 bucket.
 
     This function attempts to download the content of an object stored in an Amazon S3 bucket
@@ -45,14 +47,6 @@ def get_file_from_s3_bucket(client, bucket_name, key):
 
     except ClientError as err:
         code = err.response["Error"]["Code"]
-        error_map = {
-            "NoSuchBucket": "The specified bucket does not exist.",
-            "NoSuchKey": "The specified key does not exist.",
-            "InvalidBucketName": "The S3 bucket name provided is invalid.",
-            "AccessDenied": "Access denied when reading from the S3 bucket.",
-            "InternalError": "An internal AWS error occurred. Try again.",
-            "SlowDown": "Too many requests sent to S3. Try again later.",
-        }
         message = error_map.get(code)
         return {"error": {"message": f"{code}: {message}"}}
 
