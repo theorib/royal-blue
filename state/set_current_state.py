@@ -1,9 +1,9 @@
 import json
 import logging
 
-logger = logging.getLogger(__name__)
-
 from src.utils import add_to_s3_bucket
+
+logger = logging.getLogger(__name__)
 
 
 def set_current_state(
