@@ -4,7 +4,9 @@ from unittest.mock import Mock
 import pandas as pd
 import pytest
 
-from src.utils import create_parquets_from_data_frames
+from src.utilities.parquets.create_parquets_from_data_frames import (
+    create_parquets_from_data_frames,
+)
 
 
 @pytest.mark.describe("create_parquets_from_data_frames Utility Function Behaviour")

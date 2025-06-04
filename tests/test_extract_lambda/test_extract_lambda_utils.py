@@ -4,11 +4,11 @@ from datetime import datetime
 import pandas as pd
 import pytest
 
-from src.lambdas.extract_lambda.custom_errors import InvalidEmptyList
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
     get_last_updated_from_raw_table_data,
 )
+from src.utilities.custom_errors import InvalidEmptyList
 
 
 @pytest.mark.describe("Test create_data_frame_from_list")

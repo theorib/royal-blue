@@ -1,7 +1,7 @@
 import copy
 
-from state.get_current_state import get_current_state
-from state.set_current_state import set_current_state
+from src.utilities.state.get_current_state import get_current_state
+from src.utilities.state.set_current_state import set_current_state
 
 
 def update_state(parquet_files, s3_client, bucket_name):

@@ -4,7 +4,7 @@ from typing import List
 
 import pandas as pd
 
-from src.lambdas.extract_lambda.custom_errors import InvalidEmptyList
+from src.utilities.custom_errors import InvalidEmptyList
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

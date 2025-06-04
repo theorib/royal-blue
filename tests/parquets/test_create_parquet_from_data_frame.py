@@ -5,10 +5,10 @@ from io import BytesIO
 import pandas as pd
 import pytest
 
-from src.lambdas.extract_lambda.create_parquet_from_data_frame import (
+from src.utilities.custom_errors import InvalidDataFrame
+from src.utilities.parquets.create_parquet_from_data_frame import (
     create_parquet_from_data_frame,
 )
-from src.lambdas.extract_lambda.custom_errors import InvalidDataFrame
 
 
 @pytest.mark.describe("create_parquet_from_data_frame Utility Function Behaviour")
