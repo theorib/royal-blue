@@ -6,7 +6,8 @@ from src.lambdas.transform_lambda.utilities.convert_parquet_to_dataframe import 
 from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
 
 BUCKET_NAME = "ingestion-zone-20250530151335299400000005"
-client = boto3.client('s3')
+client = boto3.client("s3")
+
 
 def extract_dataframes_from_event(client, event):
     """
@@ -39,7 +40,7 @@ def extract_dataframes_from_event(client, event):
         If any error occurs while processing any of the tables in the event list.
     """
     extracted_data_frames = {}
-    
+
     try:
         for table in event:
             key = table["key"]
