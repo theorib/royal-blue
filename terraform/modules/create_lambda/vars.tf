@@ -1,6 +1,13 @@
-variable "filename" {
-  type        = string
-  description = "(Optional) Path to the function's deployment package within the local filesystem. Exactly one of filename, image_uri, or s3_bucket must be specified."
+# variable "filename" {
+#   type        = string
+#   description = "(Optional) Path to the function's deployment package within the local filesystem. Exactly one of filename, image_uri, or s3_bucket must be specified."
+# }
+
+variable "s3_bucket" {
+  type = string
+}
+variable "s3_key" {
+  type = string
 }
 
 variable "function_name" {
