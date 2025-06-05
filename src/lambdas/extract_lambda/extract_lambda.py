@@ -112,7 +112,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 parquet_file = create_parquet_from_data_frame(table_df)
 
                 filename, key = create_parquet_metadata(
-                    table_name, new_table_data_last_updated
+                    new_table_data_last_updated, table_name
                 )
 
                 response = add_file_to_s3_bucket(
@@ -161,4 +161,4 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
 if __name__ == "__main__":
     result = lambda_handler({}, {})
-    pprint(result)
+    # pprint(result)
