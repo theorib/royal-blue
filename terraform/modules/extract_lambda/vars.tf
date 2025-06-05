@@ -6,6 +6,7 @@ variable "python_runtime" {
 }
 
 variable "ingestion_zone_bucket" {
+  description = "Lambda S3 ingestion zone bucket ARN and ID. To be used internaly by lambda's source code via terraform injected environment variables and to create IAM permissions"
   type = object({
     id  = string
     arn = string
@@ -13,29 +14,34 @@ variable "ingestion_zone_bucket" {
 }
 
 variable "lambda_state_bucket" {
+  description = "Lambda S3 state storage bucket ARN and ID. To be used internaly by lambda's source code via terraform injected environment variables and to create IAM permissions"
   type = object({
     id  = string
     arn = string
   })
 }
-
 variable "DB_USER" {
-  type      = string
-  sensitive = true
+  description = "Totesys database user credentials"
+  type        = string
+  sensitive   = true
 }
 variable "DB_PASSWORD" {
-  type      = string
-  sensitive = true
+  description = "Totesys database user password credentials"
+  type        = string
+  sensitive   = true
 }
 variable "DB_HOST" {
-  type      = string
-  sensitive = true
+  description = "Totesys database host url"
+  type        = string
+  sensitive   = true
 }
 variable "DB_DATABASE" {
-  type      = string
-  sensitive = true
+  description = "Totesys database name"
+  type        = string
+  sensitive   = true
 }
 variable "DB_PORT" {
-  type      = string
-  sensitive = true
+  description = "Totesys database PostgreSQL port"
+  type        = string
+  sensitive   = true
 }

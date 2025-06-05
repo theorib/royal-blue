@@ -10,22 +10,27 @@ variable "step_function_type" {
 }
 
 variable "DB_USER" {
-  type      = string
-  sensitive = true
+  description = "Totesys database user credentials"
+  type        = string
+  sensitive   = true
 }
 variable "DB_PASSWORD" {
-  type      = string
-  sensitive = true
+  description = "Totesys database user password credentials"
+  type        = string
+  sensitive   = true
 }
 variable "DB_HOST" {
-  type      = string
-  sensitive = true
+  description = "Totesys database host url"
+  type        = string
+  sensitive   = true
 }
 variable "DB_DATABASE" {
-  type      = string
-  sensitive = true
+  description = "Totesys database name"
+  type        = string
+  sensitive   = true
 }
 variable "DB_PORT" {
-  type      = string
-  sensitive = true
+  description = "Totesys database PostgreSQL port"
+  type        = string
+  sensitive   = true
 }
