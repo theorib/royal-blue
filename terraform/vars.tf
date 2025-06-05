@@ -8,3 +8,24 @@ variable "step_function_type" {
   type        = string
   default     = "STANDARD"
 }
+
+variable "DB_USER" {
+  type      = string
+  sensitive = true
+}
+variable "DB_PASSWORD" {
+  type      = string
+  sensitive = true
+}
+variable "DB_HOST" {
+  type      = string
+  sensitive = true
+}
+variable "DB_DATABASE" {
+  type      = string
+  sensitive = true
+}
+variable "DB_PORT" {
+  type      = string
+  sensitive = true
+}
