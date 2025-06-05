@@ -45,6 +45,6 @@ def dim_currency_dataframe(extracted_dataframes: dict):
 
         dim_currency = currency_df[["currency_id", "currency_code", "currency_name"]]
         return dim_currency
-    
+
     except Exception as e:
         raise e

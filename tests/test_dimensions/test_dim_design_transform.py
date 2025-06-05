@@ -20,11 +20,16 @@ def mock_design_df():
 
 
 def test_dim_design_in_DF(mock_design_df):
-    df = {"design":mock_design_df}
+    df = {"design": mock_design_df}
     result = dim_design_dataframe(df)
 
     assert not result.empty
-    assert list(result.columns) == ["design_id", "design_name", "file_location", "file_name"]
+    assert list(result.columns) == [
+        "design_id",
+        "design_name",
+        "file_location",
+        "file_name",
+    ]
     assert len(result) == 2
 
 
