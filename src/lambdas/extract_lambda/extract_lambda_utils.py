@@ -38,12 +38,15 @@ def initialize_table_state(current_state, table_name):
 
     new_state = deepcopy(current_state)
     new_state["ingest_state"][table_name] = {
-            "last_updated": None,
-            "ingest_log": [],
+        "last_updated": None,
+        "ingest_log": [],
     }
     return new_state
 
-def create_parquet_metadata(new_table_data_last_updated:datetime, table_name:str) -> tuple[str, str]:
+
+def create_parquet_metadata(
+    new_table_data_last_updated: datetime, table_name: str
+) -> tuple[str, str]:
     year = new_table_data_last_updated.year
     month = new_table_data_last_updated.month
     day = new_table_data_last_updated.day

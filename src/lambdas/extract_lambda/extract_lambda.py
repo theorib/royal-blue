@@ -111,7 +111,9 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 table_df = create_data_frame_from_list(table_data)
                 parquet_file = create_parquet_from_data_frame(table_df)
 
-                filename, key = create_parquet_metadata(table_name, new_table_data_last_updated)
+                filename, key = create_parquet_metadata(
+                    table_name, new_table_data_last_updated
+                )
 
                 response = add_file_to_s3_bucket(
                     s3_client, INGEST_ZONE_BUCKET_NAME, key, parquet_file
