@@ -19,7 +19,7 @@ def filter_out_values(values: List[str], values_to_filter: List[str]):
 def get_totesys_table_names(
     conn: Connection[DictRow],
     table_names_to_filter_out: List[str] = ["_prisma_migrations"],
-) -> List[dict]:
+) -> List[str]:
     query = """
         SELECT table_name
           FROM information_schema.tables

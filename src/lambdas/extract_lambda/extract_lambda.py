@@ -2,7 +2,7 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pprint
+from pprint import pformat, pprint
 
 import boto3
 
@@ -10,7 +10,9 @@ from src.db.connection import connect_db
 from src.db.db_helpers import get_table_data, get_totesys_table_names
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
+    create_parquet_metadata,
     get_last_updated_from_raw_table_data,
+    initialize_table_state,
 )
 from src.utilities.parquets.create_parquet_from_data_frame import (
     create_parquet_from_data_frame,
@@ -78,23 +80,10 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
             totesys_tables = get_totesys_table_names(conn)
 
             for table_name in totesys_tables:
-                # TODO Logging starting the loop????
-
                 logger.info(f"Starting extraction of {table_name}")
 
                 current_state = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
-
-                # ------------------------------------------------
-                # TODO encapsulate this into a function
-                # initialize_table_state(current_state, table_name)
-                # should return the updated state or if the table state was already there, leave it untouched and return it (watch for purity, return a new object)
-                # file: utilities/extract_lambda_utils/initialize_table_state.py
-                if not current_state["ingest_state"].get(table_name):
-                    current_state["ingest_state"][table_name] = {
-                        "last_updated": None,
-                        "ingest_log": [],
-                    }
-                # ------------------------------------------------
+                current_state = initialize_table_state(current_state, table_name)
 
                 current_state_last_updated: datetime | None = current_state[
                     "ingest_state"
@@ -115,7 +104,6 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                     continue
 
                 table_data = db_response["success"]["data"]
-
                 new_table_data_last_updated: datetime = (
                     get_last_updated_from_raw_table_data(table_data)
                 )
@@ -123,30 +111,15 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 table_df = create_data_frame_from_list(table_data)
                 parquet_file = create_parquet_from_data_frame(table_df)
 
-                # ------------------------------------------------
-                # TODO encapsulate creating file names and keys into a function
-                # create_parquet_metadata(new_table_data_last_updated:datetime, table_name:str)
-                # returns (
-                # filename,
-                # key
-                # )
-                # file: utilities/extract_lambda_utils/create_parquet_metadata.py
-                year = new_table_data_last_updated.year
-                month = new_table_data_last_updated.month
-                day = new_table_data_last_updated.day
-
-                # currency_2025-06-13_10-35-20_012023.parquet
-                filename = f"{table_name}_{year}-{month}-{day}_{new_table_data_last_updated.hour}-{new_table_data_last_updated.minute}-{new_table_data_last_updated.second}_{new_table_data_last_updated.microsecond}.parquet"
-
-                # 2025/06/13/currency_2025-06-13_10-35-20_012023.parquet
-                key = f"{year}/{month}/{day}/{filename}"
-                # ------------------------------------------------
+                filename, key = create_parquet_metadata(
+                    new_table_data_last_updated, table_name
+                )
 
                 response = add_file_to_s3_bucket(
                     s3_client, INGEST_ZONE_BUCKET_NAME, key, parquet_file
                 )
 
-                # ! REVIEW should I get raw error obhect from add_file_to_s3_bucket function??
+                # ! REVIEW should I get raw error object from add_file_to_s3_bucket function??
                 if response.get("error"):
                     raise response["error"]["raw_response"]  # type: ignore
 
@@ -177,8 +150,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
                 logger.info(f"Finish extracting table:{table_name} data")
 
-        # !TODO how can we "pretty print" a logger??
-        logger.info(f"Result of extraction process: {result}")
+        logger.info("Result of extraction process:\n%s", pformat(result))
         logger.info("End of extraction process for all tables")
         return result
 
@@ -189,4 +161,4 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
 if __name__ == "__main__":
     result = lambda_handler({}, {})
-    pprint(result)
+    # pprint(result)
