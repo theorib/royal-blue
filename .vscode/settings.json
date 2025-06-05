@@ -24,6 +24,5 @@
                 "F401"
             ]
         }
-    },
-    "makefile.configureOnOpen": true
+    }
 }
