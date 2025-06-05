@@ -7,7 +7,7 @@ from src.lambdas.transform_lambda.dimensions.helpers import (
 
 def convert_dataframes_to_dimensions(extracted_dataframes):
     dimension_columns = {
-         "staff": dim_staff_dataframe(extracted_dataframes), #["staff_id", "first_name", "last_name", "department_name", "location", "email_address"],
+        "staff": dim_staff_dataframe(extracted_dataframes), #["staff_id", "first_name", "last_name", "department_name", "location", "email_address"],
         "counterparty": [],
         "location": ["location_id", "address_line_1", "address_line_2", "district", "city", "postal_code", "country", "phone"],
         "design": ["design_id", "design_name", "file_location", "file_name"],
