@@ -42,11 +42,7 @@ class TestCurrencyDimensions:
         assert result.shape == (3, 3)
         assert list(result.columns) == ["currency_id", "currency_code", "currency_name"]
 
-        expected_names = {
-            "USD": "US Dollar",
-            "EUR": "Euro",
-            "JPY": "Japanese Yen"
-        }
+        expected_names = {"USD": "US Dollar", "EUR": "Euro", "JPY": "Japanese Yen"}
 
         for _, row in result.iterrows():
             code = row["currency_code"]
