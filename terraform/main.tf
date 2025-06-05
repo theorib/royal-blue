@@ -32,15 +32,17 @@ module "etl_scheduler" {
 module "extract_lambda" {
   source         = "./modules/extract_lambda"
   python_runtime = var.python_runtime
+  ingestion_zone_bucket = {
+    arn = aws_s3_bucket.ingestion_zone.arn
+    id  = aws_s3_bucket.ingestion_zone.id
+  }
+  lambda_state_bucket = {
+    arn = aws_s3_bucket.lambda_state.arn
+    id  = aws_s3_bucket.lambda_state.id
+  }
+  DB_USER     = var.DB_USER
+  DB_PASSWORD = var.DB_PASSWORD
+  DB_HOST     = var.DB_HOST
+  DB_DATABASE = var.DB_DATABASE
+  DB_PORT     = var.DB_PORT
 }
-
-module "process_zone_bucket" {
-  source                = "./modules/create_s3_bucket"
-  s3_bucket_name_prefix = "processed-zone-"
-}
-
-module "state_bucket" {
-  source                = "./modules/create_s3_bucket"
-  s3_bucket_name_prefix = "lambda-state-"
-}
-
