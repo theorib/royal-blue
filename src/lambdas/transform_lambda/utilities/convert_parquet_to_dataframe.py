@@ -11,4 +11,4 @@ def parquet_to_dataframe(parquet_file):
         restored_data_frame = pd.read_parquet(BytesIO(parquet_file))
         return restored_data_frame
     except Exception as e:
-        raise e
+        raise ValueError(f"Failed to convert Parquet file to DataFrame: {e}")
