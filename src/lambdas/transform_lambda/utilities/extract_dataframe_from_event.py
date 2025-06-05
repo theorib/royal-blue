@@ -42,13 +42,19 @@ def extract_dataframes_from_event(client, event):
     
     try:
         for table in event:
-            key = table['key']  
-            parquet_file = get_file_from_s3_bucket(client, BUCKET_NAME, key)
-            data_frame = parquet_to_dataframe(parquet_file)
-            
-            extracted_data_frames[table['table_name']] = data_frame
-            
-        return extracted_data_frames
+            key = table["key"]
+            s3_result = get_file_from_s3_bucket(client, BUCKET_NAME, key)
+
+            if s3_result.get("success"):
+                parquet_bytes = s3_result["success"]["data"].encode("utf-8")
+                data_frame = parquet_to_dataframe(parquet_bytes)
+                extracted_data_frames[table["table_name"]] = data_frame
+            elif s3_result.get("error"):
+                raise Exception(s3_result["error"]["message"])
+            else:
+                raise Exception("Unknown error retrieving Parquet file from S3")
+                    
+            return extracted_data_frames
     
     except Exception as e:
         raise Exception(f"Error processing table '{table['table_name']}': {e}")
