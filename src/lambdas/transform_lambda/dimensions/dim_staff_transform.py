@@ -12,7 +12,6 @@ def dim_staff_dataframe(extracted_dataframes: dict):
     if departments_df is None:
         raise ValueError('Error:')
     
-    
     try:
         staff_df = staff_df.merge(
             departments_df[['department_id', 'department_name']],
@@ -20,7 +19,6 @@ def dim_staff_dataframe(extracted_dataframes: dict):
             on="department_id"
         )
         
-         # Merge staff ←→ purchase_order to get delivery location ID
         staff_orders = purchase_order_df[['staff_id', 'agreed_delivery_location_id']].drop_duplicates()
         staff_df = staff_df.merge(
             staff_orders,
@@ -29,7 +27,6 @@ def dim_staff_dataframe(extracted_dataframes: dict):
             right_on='staff_id'
         )
 
-        # Merge location ID ←→ address table
         staff_df = staff_df.merge(
             locations_df[['address_id', 'city', 'country']],
             how='left',
@@ -37,7 +34,6 @@ def dim_staff_dataframe(extracted_dataframes: dict):
             right_on='address_id'
         )
 
-        # Create a readable location string
         staff_df['location'] = staff_df['city'].fillna('Unknown') + ', ' + staff_df['country'].fillna('Unknown')
 
 
