@@ -1,7 +1,7 @@
 import logging
+from copy import deepcopy
 from datetime import datetime
 from typing import List
-from copy import deepcopy
 
 import pandas as pd
 

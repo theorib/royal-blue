@@ -2,7 +2,7 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pprint,pformat
+from pprint import pformat, pprint
 
 import boto3
 
@@ -10,14 +10,13 @@ from src.db.connection import connect_db
 from src.db.db_helpers import get_table_data, get_totesys_table_names
 from src.lambdas.extract_lambda.extract_lambda_utils import (
     create_data_frame_from_list,
+    create_parquet_metadata,
     get_last_updated_from_raw_table_data,
     initialize_table_state,
-    create_parquet_metadata
 )
 from src.utilities.parquets.create_parquet_from_data_frame import (
     create_parquet_from_data_frame,
 )
-
 from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 from src.utilities.state.get_current_state import get_current_state
 from src.utilities.state.set_current_state import set_current_state
@@ -112,11 +111,13 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 table_df = create_data_frame_from_list(table_data)
                 parquet_file = create_parquet_from_data_frame(table_df)
 
+                filename, key = create_parquet_metadata(table_name, new_table_data_last_updated)
+
                 response = add_file_to_s3_bucket(
                     s3_client, INGEST_ZONE_BUCKET_NAME, key, parquet_file
                 )
 
-                # ! REVIEW should I get raw error obhect from add_file_to_s3_bucket function??
+                # ! REVIEW should I get raw error object from add_file_to_s3_bucket function??
                 if response.get("error"):
                     raise response["error"]["raw_response"]  # type: ignore
 
@@ -147,7 +148,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
                 logger.info(f"Finish extracting table:{table_name} data")
 
-        logger.info("Result of extraction process:", pformat({result}))
+        logger.info("Result of extraction process:\n%s", pformat(result))
         logger.info("End of extraction process for all tables")
         return result
 
