@@ -2,7 +2,7 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pformat, pprint
+from pprint import pformat
 
 import boto3
 import orjson
