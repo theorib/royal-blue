@@ -49,4 +49,4 @@ set-tfvars:  ## Copy .env variables to terraform/terraform.auto.tfvars file
 	./set-tfvars.sh
 
 .PHONY: setup
-setup: sync set-tfvars checks
+setup: sync set-tfvars checks ## Runs all checks and instalation scripts to get your project running
