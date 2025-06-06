@@ -3,7 +3,7 @@ from io import BytesIO
 import pandas as pd
 import pytest
 
-from src.lambdas.transform_lambda.utilities.convert_parquet_to_dataframe import (
+from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
     parquet_to_dataframe,
 )
 

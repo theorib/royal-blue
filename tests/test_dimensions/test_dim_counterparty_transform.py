@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.lambdas.transform_lambda.dimensions.dim_counterparty_transform import (
+from src.utilities.dimensions.dim_counterparty_transform import (
     dim_counterparty_dataframe,
 )
 

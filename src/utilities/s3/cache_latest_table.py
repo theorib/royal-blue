@@ -2,7 +2,7 @@ import os
 
 from get_file_from_s3_bucket import get_file_from_s3_bucket
 
-from src.lambdas.transform_lambda.utilities.convert_parquet_to_dataframe import (
+from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
     parquet_to_dataframe,
 )
 from utilities.state.get_current_state import get_current_state
@@ -23,25 +23,6 @@ def get_(client, extracted_dataframes, table_name):
     Returns:
         _type_: _description_
     """
-    required_tables = {
-        "design",
-        "counterparty",
-        "address",
-        "currency",
-        "staff",
-        "department",
-        "transaction",
-        "sales_order",
-    }
-    missing_tables = required_tables - set(extracted_dataframes.keys())
-
-    # Load
-    if (
-        extracted_dataframes.get(table_name)
-        and extracted_dataframes[table_name] is not None
-    ):
-        return extracted_dataframes[table_name]
-
     try:
         # Cache
         state = get_current_state(client, INGEST_ZONE_BUCKET_NAME)
