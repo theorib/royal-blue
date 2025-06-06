@@ -58,28 +58,28 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 
 
 # ------------------------------
-# Lambda IAM Policies for S3 Ingestion Zone Bucket Write
+# Lambda IAM Policies for S3 Process Zone Bucket
 # ------------------------------
 
 # Define
-data "aws_iam_policy_document" "ingest_zone_bucket_policy_doc" {
+data "aws_iam_policy_document" "process_zone_bucket_policy_doc" {
   statement {
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${var.ingest_zone_bucket.arn}/*"]
+    actions   = ["s3:GetObject"]
+    resources = ["${var.process_zone_bucket.arn}/*"]
   }
 }
 
 # Create
-resource "aws_iam_policy" "ingest_zone_bucket_policy" {
+resource "aws_iam_policy" "process_zone_bucket_policy" {
   name_prefix = "s3-policy-${var.function_name}-write-"
-  policy      = data.aws_iam_policy_document.ingest_zone_bucket_policy_doc.json
+  policy      = data.aws_iam_policy_document.process_zone_bucket_policy_doc.json
 }
 
 # Attach
-resource "aws_iam_role_policy_attachment" "ingest_zone_bucket_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "process_zone_bucket_policy_attachment" {
   role       = aws_iam_role.iam_for_lambda.name
-  policy_arn = aws_iam_policy.ingest_zone_bucket_policy.arn
+  policy_arn = aws_iam_policy.process_zone_bucket_policy.arn
 }
 
 # ------------------------------

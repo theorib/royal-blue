@@ -18,7 +18,9 @@ module "etl_state_machine" {
   type   = var.step_function_type
 
   lambda_arns = {
-    extract = module.extract_lambda.lambda_function_arn
+    extract   = module.extract_lambda.lambda.arn
+    transform = module.transform_lambda.lambda.arn
+    load      = module.load_lambda.lambda.arn
   }
 }
 
@@ -40,18 +42,72 @@ module "extract_lambda" {
     arn = aws_s3_bucket.extract_lambda_layers.arn
     id  = aws_s3_bucket.extract_lambda_layers.id
   }
-  ingestion_zone_bucket = {
-    arn = aws_s3_bucket.ingestion_zone.arn
-    id  = aws_s3_bucket.ingestion_zone.id
+  ingest_zone_bucket = {
+    arn = aws_s3_bucket.ingest_zone.arn
+    id  = aws_s3_bucket.ingest_zone.id
   }
   lambda_state_bucket = {
     arn = aws_s3_bucket.lambda_state.arn
     id  = aws_s3_bucket.lambda_state.id
   }
 
-  DB_USER     = var.DB_USER
-  DB_PASSWORD = var.DB_PASSWORD
-  DB_HOST     = var.DB_HOST
-  DB_DATABASE = var.DB_DATABASE
-  DB_PORT     = var.DB_PORT
+  TOTESYS_DB_USER     = var.TOTESYS_DB_USER
+  TOTESYS_DB_PASSWORD = var.TOTESYS_DB_PASSWORD
+  TOTESYS_DB_HOST     = var.TOTESYS_DB_HOST
+  TOTESYS_DB_DATABASE = var.TOTESYS_DB_DATABASE
+  TOTESYS_DB_PORT     = var.TOTESYS_DB_PORT
+}
+
+module "transform_lambda" {
+  source         = "./modules/transform_lambda"
+  python_runtime = var.python_runtime
+  s3_bucket = {
+    arn = aws_s3_bucket.lambda_source_code.arn
+    id  = aws_s3_bucket.lambda_source_code.id
+  }
+  lambda_layers_bucket = {
+    arn = aws_s3_bucket.extract_lambda_layers.arn
+    id  = aws_s3_bucket.extract_lambda_layers.id
+  }
+  ingest_zone_bucket = {
+    arn = aws_s3_bucket.ingest_zone.arn
+    id  = aws_s3_bucket.ingest_zone.id
+  }
+  lambda_state_bucket = {
+    arn = aws_s3_bucket.lambda_state.arn
+    id  = aws_s3_bucket.lambda_state.id
+  }
+
+  process_zone_bucket = {
+    arn = aws_s3_bucket.process_zone.arn
+    id  = aws_s3_bucket.process_zone.id
+  }
+}
+
+module "load_lambda" {
+  source         = "./modules/load_lambda"
+  python_runtime = var.python_runtime
+  s3_bucket = {
+    arn = aws_s3_bucket.lambda_source_code.arn
+    id  = aws_s3_bucket.lambda_source_code.id
+  }
+  lambda_layers_bucket = {
+    arn = aws_s3_bucket.extract_lambda_layers.arn
+    id  = aws_s3_bucket.extract_lambda_layers.id
+  }
+  lambda_state_bucket = {
+    arn = aws_s3_bucket.lambda_state.arn
+    id  = aws_s3_bucket.lambda_state.id
+  }
+
+  process_zone_bucket = {
+    arn = aws_s3_bucket.process_zone.arn
+    id  = aws_s3_bucket.process_zone.id
+  }
+
+  DATAWAREHOUSE_DB_USER     = var.DATAWAREHOUSE_DB_USER
+  DATAWAREHOUSE_DB_PASSWORD = var.DATAWAREHOUSE_DB_PASSWORD
+  DATAWAREHOUSE_DB_HOST     = var.DATAWAREHOUSE_DB_HOST
+  DATAWAREHOUSE_DB_DATABASE = var.DATAWAREHOUSE_DB_DATABASE
+  DATAWAREHOUSE_DB_PORT     = var.DATAWAREHOUSE_DB_PORT
 }

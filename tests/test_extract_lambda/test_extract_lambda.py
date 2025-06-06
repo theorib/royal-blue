@@ -2,19 +2,19 @@ import pytest
 
 
 @pytest.mark.describe(
-    "Check extract_lambda interaction with Totesys DB, parquet files and ingestion_zone s3 bucket"
+    "Check extract_lambda interaction with Totesys DB, parquet files and ingest_zone s3 bucket"
 )
 class TestExtractLambdaAddParquetToIngestionZone:
     @pytest.mark.skip
     @pytest.mark.it(
-        "check that it creates one file per table from totesys DB on first connection to DB saves them as parquet files in ingestion_zone s3 bucket"
+        "check that it creates one file per table from totesys DB on first connection to DB saves them as parquet files in ingest_zone s3 bucket"
     )
     def test_extracts_all_first_connection(self):
         pass
 
     @pytest.mark.skip
     @pytest.mark.it(
-        "check that it extracts only data that was not extracted before from totesys DB and saves only the new data to ingestion_zone s3 bucket as parquet files"
+        "check that it extracts only data that was not extracted before from totesys DB and saves only the new data to ingest_zone s3 bucket as parquet files"
     )
     def test_extracts_new_data_only(self):
         pass
@@ -38,14 +38,14 @@ class TestExtractLambdaReturn:
 
     @pytest.mark.skip
     @pytest.mark.it(
-        "check that it returns a list all files (one file per DB table) which were saved to ingestion_zone s3 bucket from the first totesys DB data extraction"
+        "check that it returns a list all files (one file per DB table) which were saved to ingest_zone s3 bucket from the first totesys DB data extraction"
     )
     def test_returns_dict_of_files_per_table(self):
         pass
 
     @pytest.mark.skip
     @pytest.mark.it(
-        "check that it returns a list of only new files saved to ingestion_zone s3 bucket when extracting newly added data from totesys DB"
+        "check that it returns a list of only new files saved to ingest_zone s3 bucket when extracting newly added data from totesys DB"
     )
     def test_returns_dict_of_new_updates(self):
         pass
@@ -55,7 +55,7 @@ class TestExtractLambdaReturn:
 class TestExtractLambdaState:
     @pytest.mark.skip
     @pytest.mark.it(
-        "check that after data is saved to ingestion_zone s3 bucket, that extract_lambda updates the state file in the state_management bucket"
+        "check that after data is saved to ingest_zone s3 bucket, that extract_lambda updates the state file in the state_management bucket"
     )
     def test_updates_state_file(self):
         pass

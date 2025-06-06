@@ -9,13 +9,8 @@ resource "aws_lambda_function" "lambda" {
   timeout          = 200
   environment {
     variables = {
-      INGEST_ZONE_BUCKET_NAME  = var.ingest_zone_bucket.id
+      PROCESS_ZONE_BUCKET_NAME = var.process_zone_bucket.id
       LAMBDA_STATE_BUCKET_NAME = var.lambda_state_bucket.id
-      TOTESYS_DB_USER          = var.TOTESYS_DB_USER
-      TOTESYS_DB_PASSWORD      = var.TOTESYS_DB_PASSWORD
-      TOTESYS_DB_HOST          = var.TOTESYS_DB_HOST
-      TOTESYS_DB_DATABASE      = var.TOTESYS_DB_DATABASE
-      TOTESYS_DB_PORT          = var.TOTESYS_DB_PORT
     }
   }
 

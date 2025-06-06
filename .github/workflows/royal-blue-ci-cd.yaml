@@ -38,11 +38,16 @@ jobs:
 
       - name: Run Tests with Coverage
         env:
-          DB_USER: ${{secrets.DB_USER}}
-          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-          DB_HOST: ${{secrets.DB_HOST}}
-          DB_DATABASE: ${{secrets.DB_DATABASE}}
-          DB_PORT: ${{secrets.DB_PORT}}
+          TOTESYS_DB_USER: ${{secrets.TOTESYS_DB_USER}}
+          TOTESYS_DB_PASSWORD: ${{secrets.TOTESYS_DB_PASSWORD}}
+          TOTESYS_DB_HOST: ${{secrets.TOTESYS_DB_HOST}}
+          TOTESYS_DB_DATABASE: ${{secrets.TOTESYS_DB_DATABASE}}
+          TOTESYS_DB_PORT: ${{secrets.TOTESYS_DB_PORT}}
+          DATAWAREHOUSE_DB_USER: ${{secrets.DATAWAREHOUSE_DB_USER}}
+          DATAWAREHOUSE_DB_PASSWORD: ${{secrets.DATAWAREHOUSE_DB_PASSWORD}}
+          DATAWAREHOUSE_DB_HOST: ${{secrets.DATAWAREHOUSE_DB_HOST}}
+          DATAWAREHOUSE_DB_DATABASE: ${{secrets.DATAWAREHOUSE_DB_DATABASE}}
+          DATAWAREHOUSE_DB_PORT: ${{secrets.DATAWAREHOUSE_DB_PORT}}
         run: uv run pytest --cov=src tests/
 
       - name: Run Bandit Security Scan
@@ -84,8 +89,9 @@ jobs:
       
       - name: run pre-terraform build scripts
         run: ./build_extract_lambda_zip.sh |
-          ./build_lambda_layer.sh |
-          ./build_transform_lambda_zip.sh
+          ./build_transform_lambda_zip.sh |
+          ./build_load_lambda_zip.sh |
+          ./build_lambda_layer.sh 
       - name: terraform format
         working-directory: terraform
         run: terraform fmt -recursive
@@ -95,18 +101,28 @@ jobs:
       - name: terraform plan
         working-directory: terraform
         env:
-          TF_VAR_DB_USER: ${{secrets.DB_USER}}
-          TF_VAR_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-          TF_VAR_DB_HOST: ${{secrets.DB_HOST}}
-          TF_VAR_DB_DATABASE: ${{secrets.DB_DATABASE}}
-          TF_VAR_DB_PORT: ${{secrets.DB_PORT}}
+          TF_VAR_TOTESYS_DB_USER: ${{secrets.TOTESYS_DB_USER}}
+          TF_VAR_TOTESYS_DB_PASSWORD: ${{secrets.TOTESYS_DB_PASSWORD}}
+          TF_VAR_TOTESYS_DB_HOST: ${{secrets.TOTESYS_DB_HOST}}
+          TF_VAR_TOTESYS_DB_DATABASE: ${{secrets.TOTESYS_DB_DATABASE}}
+          TF_VAR_TOTESYS_DB_PORT: ${{secrets.TOTESYS_DB_PORT}}
+          TF_VAR_DATAWAREHOUSE_DB_USER: ${{secrets.DATAWAREHOUSE_DB_USER}}
+          TF_VAR_DATAWAREHOUSE_DB_PASSWORD: ${{secrets.DATAWAREHOUSE_DB_PASSWORD}}
+          TF_VAR_DATAWAREHOUSE_DB_HOST: ${{secrets.DATAWAREHOUSE_DB_HOST}}
+          TF_VAR_DATAWAREHOUSE_DB_DATABASE: ${{secrets.DATAWAREHOUSE_DB_DATABASE}}
+          TF_VAR_DATAWAREHOUSE_DB_PORT: ${{secrets.DATAWAREHOUSE_DB_PORT}}
         run: terraform plan -out=tfplan
       - name: terraform apply
         working-directory: terraform
         env:
-          TF_VAR_DB_USER: ${{secrets.DB_USER}}
-          TF_VAR_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
-          TF_VAR_DB_HOST: ${{secrets.DB_HOST}}
-          TF_VAR_DB_DATABASE: ${{secrets.DB_DATABASE}}
-          TF_VAR_DB_PORT: ${{secrets.DB_PORT}}
+          TF_VAR_TOTESYS_DB_USER: ${{secrets.TOTESYS_DB_USER}}
+          TF_VAR_TOTESYS_DB_PASSWORD: ${{secrets.TOTESYS_DB_PASSWORD}}
+          TF_VAR_TOTESYS_DB_HOST: ${{secrets.TOTESYS_DB_HOST}}
+          TF_VAR_TOTESYS_DB_DATABASE: ${{secrets.TOTESYS_DB_DATABASE}}
+          TF_VAR_TOTESYS_DB_PORT: ${{secrets.TOTESYS_DB_PORT}}
+          TF_VAR_DATAWAREHOUSE_DB_USER: ${{secrets.DATAWAREHOUSE_DB_USER}}
+          TF_VAR_DATAWAREHOUSE_DB_PASSWORD: ${{secrets.DATAWAREHOUSE_DB_PASSWORD}}
+          TF_VAR_DATAWAREHOUSE_DB_HOST: ${{secrets.DATAWAREHOUSE_DB_HOST}}
+          TF_VAR_DATAWAREHOUSE_DB_DATABASE: ${{secrets.DATAWAREHOUSE_DB_DATABASE}}
+          TF_VAR_DATAWAREHOUSE_DB_PORT: ${{secrets.DATAWAREHOUSE_DB_PORT}}
         run: terraform apply -auto-approve tfplan

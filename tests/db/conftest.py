@@ -7,29 +7,29 @@ from psycopg import Connection
 
 @pytest.fixture(scope="function")
 def patched_envs(monkeypatch):
-    monkeypatch.setenv("DB_USER", "user")
-    monkeypatch.setenv("DB_PASSWORD", "pass")
-    monkeypatch.setenv("DB_HOST", "localhost")
-    monkeypatch.setenv("DB_DATABASE", "testdb")
-    monkeypatch.setenv("DB_PORT", "5432")
+    monkeypatch.setenv("TOTESYS_DB_USER", "user")
+    monkeypatch.setenv("TOTESYS_DB_PASSWORD", "pass")
+    monkeypatch.setenv("TOTESYS_DB_HOST", "localhost")
+    monkeypatch.setenv("TOTESYS_DB_DATABASE", "testdb")
+    monkeypatch.setenv("TOTESYS_DB_PORT", "5432")
 
 
 @pytest.fixture(scope="function")
 def patched_envs_error(monkeypatch):
-    monkeypatch.setenv("DB_USER", "invalid")
-    monkeypatch.setenv("DB_PASSWORD", "pass")
-    monkeypatch.setenv("DB_HOST", "invalid_host")
-    monkeypatch.setenv("DB_DATABASE", "testdb")
-    monkeypatch.setenv("DB_PORT", "5432")
+    monkeypatch.setenv("TOTESYS_DB_USER", "invalid")
+    monkeypatch.setenv("TOTESYS_DB_PASSWORD", "pass")
+    monkeypatch.setenv("TOTESYS_DB_HOST", "invalid_host")
+    monkeypatch.setenv("TOTESYS_DB_DATABASE", "testdb")
+    monkeypatch.setenv("TOTESYS_DB_PORT", "5432")
 
 
 @pytest.fixture(scope="function")
 def connection_info(patched_envs):
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-    host = os.getenv("DB_HOST")
-    dbname = os.getenv("DB_DATABASE")
-    port = os.getenv("DB_PORT")
+    user = os.getenv("TOTESYS_DB_USER")
+    password = os.getenv("TOTESYS_DB_PASSWORD")
+    host = os.getenv("TOTESYS_DB_HOST")
+    dbname = os.getenv("TOTESYS_DB_DATABASE")
+    port = os.getenv("TOTESYS_DB_PORT")
 
     return f"user={user} password={password} host={host} dbname={dbname} port={int(port or 0000)}"
 
