@@ -81,7 +81,11 @@ jobs:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{secrets.AWS_DEFAULT_REGION}}
-          
+      
+      - name: run pre-terraform build scripts
+        run: ./build_extract_lambda_zip.sh |
+          ./build_lambda_layer.sh |
+          ./build_transform_lambda_zip.sh
       - name: terraform format
         working-directory: terraform
         run: terraform fmt -recursive
