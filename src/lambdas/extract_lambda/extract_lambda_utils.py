@@ -1,3 +1,60 @@
+import logging
+from copy import deepcopy
+from datetime import datetime
+from typing import List
+
+import pandas as pd
+
+from src.utilities.custom_errors import InvalidEmptyList
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+def create_data_frame_from_list(data: List[dict]) -> pd.DataFrame:
+    """
+    Convert a list of dictionaries into a pandas DataFrame.
+
+    Args:
+        data (List[dict]): A list of dictionaries representing table rows.
+
+    Returns:
+        pd.DataFrame: A DataFrame created from the input list.
+
+    Raises:
+        InvalidEmptyList: If the input list is empty.
+    """
+    if len(data):
+        return pd.DataFrame(data)
+    else:
+        raise InvalidEmptyList("ERROR: List is empty")
+
+
+def get_last_updated_from_raw_table_data(rows: List[dict]) -> datetime:
+    """
+    Extract the latest datetime from the 'last_updated' field of a list of records.
+
+    Args:
+        rows (List[dict]): A list of dictionaries, each representing a row of data.
+
+    Returns:
+        datetime: The most recent datetime found in the 'last_updated' field.
+
+    Raises:
+        InvalidEmptyList: If the input list is empty.
+    """
+    if not len(rows):
+        raise InvalidEmptyList("ERROR: List is empty")
+    last_updated_column = "last_updated"
+    list_of_datetimes = []
+    for row in rows:
+        if last_updated_column in row:
+            value = row[last_updated_column]
+            if isinstance(value, datetime):
+                list_of_datetimes.append(value)
+
+    return max(list_of_datetimes)
+
 
 def initialize_table_state(current_state, table_name):
     """
