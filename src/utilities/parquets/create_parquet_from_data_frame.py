@@ -10,6 +10,18 @@ logger.setLevel(logging.INFO)
 
 
 def create_parquet_from_data_frame(data_frame: pd.DataFrame):
+    """
+    Converts a valid, non-empty pandas DataFrame to a gzipped Parquet file stored in memory.
+
+    Args:
+        data_frame (pd.DataFrame): The DataFrame to convert.
+
+    Returns:
+        BytesIO: A memory buffer containing the gzipped Parquet file.
+
+    Raises:
+        InvalidDataFrame: If the input is not a DataFrame or is empty.
+    """
     if not isinstance(data_frame, pd.DataFrame) or data_frame.empty:
         error = InvalidDataFrame("ERROR: invalid DataFrame")
         logger.error(error)

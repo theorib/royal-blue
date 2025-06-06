@@ -10,6 +10,23 @@ logger.setLevel(logging.INFO)
 
 
 def connect_db() -> Connection[DictRow]:
+    """
+    Establish a connection to a PostgreSQL database using environment variables.
+
+    Environment Variables:
+        DB_USER (str): Database username.
+        DB_PASSWORD (str): Database password.
+        DB_HOST (str): Hostname of the database.
+        DB_DATABASE (str): Name of the database.
+        DB_PORT (str): Port number (optional, defaults to 0000 if not set).
+
+    Returns:
+        Connection[DictRow]: A psycopg connection object with dictionary row factory enabled.
+
+    Raises:
+        psycopg.Error: If a database connection error occurs.
+        Exception: For any other unexpected exceptions during connection.
+    """
     user = os.getenv("DB_USER")
     password = os.getenv("DB_PASSWORD")
     host = os.getenv("DB_HOST")
@@ -31,6 +48,16 @@ def connect_db() -> Connection[DictRow]:
 
 
 def close_db(conn: Connection[Any]) -> None:
+    """
+    Safely close a PostgreSQL database connection.
+
+    Args:
+        conn (Connection[Any]): A psycopg connection object.
+
+    Raises:
+        psycopg.Error: If an error occurs while closing the connection.
+        Exception: For any other unexpected exceptions.
+    """
     try:
         if conn:
             conn.close()
