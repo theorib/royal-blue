@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def dim_counterparty_dataframe(extracted_dataframes: dict):
+def dim_counterparty_dataframe(dataframes: dict):
     """
     Transforms and returns a dimension dataframe for counterparties by merging with address data.
 
@@ -22,8 +22,8 @@ def dim_counterparty_dataframe(extracted_dataframes: dict):
         KeyError: If required columns are missing from the 'address' dataframe.
         Exception: Propagates any other unexpected exception that occurs during processing.
     """
-    counterparty_df = extracted_dataframes.get("counterparty")
-    address_df = extracted_dataframes.get("address")
+    counterparty_df = dataframes.get("counterparty")
+    address_df = dataframes.get("address")
 
     if counterparty_df is None:
         raise ValueError("Error: Missing counterparty table.")

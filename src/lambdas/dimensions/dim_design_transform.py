@@ -1,13 +1,13 @@
 import pandas as pd
 
 
-def dim_design_dataframe(extracted_dataframes: dict) -> pd.DataFrame:
+def dim_design_dataframe(dataframes: dict) -> pd.DataFrame:
     """
     Create the design dimension DataFrame from the extracted raw design data.
 
     Parameters:
     -----------
-    extracted_dataframes : dict
+    dataframes : dict
         Dictionary containing raw DataFrames extracted from source tables.
         Must contain a 'design' DataFrame.
 
@@ -23,7 +23,7 @@ def dim_design_dataframe(extracted_dataframes: dict) -> pd.DataFrame:
         If the 'design' table is missing or any error occurs during transformation.
     """
 
-    design_df = extracted_dataframes.get("design")
+    design_df = dataframes.get("design")
 
     if design_df is None:
         raise ValueError("Error: Missing design table.")

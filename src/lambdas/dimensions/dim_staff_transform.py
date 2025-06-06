@@ -1,11 +1,11 @@
 import pandas as pd
 
 
-def dim_staff_dataframe(extracted_dataframes: dict):
-    staff_df = extracted_dataframes.get("staff")
-    departments_df = extracted_dataframes.get("department")
-    address_df = extracted_dataframes.get("address")
-    purchase_order_df = extracted_dataframes.get("purchase_order")
+def dim_staff_dataframe(dataframes: dict):
+    staff_df = dataframes.get("staff")
+    departments_df = dataframes.get("department")
+    address_df = dataframes.get("address")
+    purchase_order_df = dataframes.get("purchase_order")
 
     if staff_df is None:
         raise ValueError("Error:")
