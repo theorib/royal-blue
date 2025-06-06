@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def dim_counterparty_dataframe(dataframes: dict):
     """
     Transforms and returns a dimension dataframe for counterparties by merging with address data.

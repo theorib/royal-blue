@@ -1,9 +1,9 @@
 import boto3
 
-from src.lambdas.transform_lambda.utilities.convert_parquet_to_dataframe import (
+from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
+from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
     parquet_to_dataframe,
 )
-from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
 
 BUCKET_NAME = "ingestion-zone-20250530151335299400000005"
 client = boto3.client("s3")

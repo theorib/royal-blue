@@ -1,11 +1,9 @@
 import logging
 import os
 from datetime import datetime
-from io import BytesIO
 
 import boto3
 import pandas as pd
-from utilities.extract_dataframe_from_event import extract_dataframes_from_event
 
 from lambdas.dimensions.dim_counterparty_transform import dim_counterparty_dataframe
 from lambdas.dimensions.dim_currency_transform import dim_currency_dataframe
@@ -19,17 +17,9 @@ from src.utilities.parquets.create_parquet_from_data_frame import (
 from utilities.extract_lambda_utils import create_parquet_metadata
 from utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 from utilities.s3.get_cache_missing_table import cache_missing_table
-
-REQUIRED_TABLES = {
-    "design",
-    "counterparty",
-    "address",
-    "currency",
-    "staff",
-    "department",
-    "transaction",
-    "sales_order",
-}
+from utilities.transform_lambda_utils.extract_dataframe_from_event import (
+    extract_dataframes_from_event,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -40,6 +30,17 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
+    required_tables = {
+        "design",
+        "counterparty",
+        "address",
+        "currency",
+        "staff",
+        "department",
+        "transaction",
+        "sales_order",
+    }
+
     logger.info("Starting Transformation Lambda")
     PROCESSED_BUCKET = os.environ.get("INGEST_ZONE_BUCKET_NAME")
 
@@ -48,7 +49,7 @@ def lambda_handler(event, context):
         cached_dataframes: dict[str, pd.DataFrame] = {}
 
         event_dataframes = extract_dataframes_from_event(s3_client, event)
-        missing_tables = REQUIRED_TABLES - set(event_dataframes.keys())
+        missing_tables = required_tables - set(event_dataframes.keys())
 
         if missing_tables:
             logger.info(f"Cache missing tables from s3: {', '.join(missing_tables)}")

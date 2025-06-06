@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
-from src.lambdas.transform_lambda.utilities.extract_dataframe_from_event import (
+from src.utilities.transform_lambda_utils.extract_dataframe_from_event import (
     extract_dataframes_from_event,
 )
 
@@ -52,7 +52,7 @@ class TestExtractDataFramesFromEvent:
         parquet_bytes = buffer.getvalue()
 
         with patch(
-            "src.lambdas.transform_lambda.utilities.extract_dataframe_from_event.get_file_from_s3_bucket"
+            "src.utilities.transform_lambda_utils.extract_dataframe_from_event.get_file_from_s3_bucket"
         ) as mock_get_file_from_s3:
             mock_get_file_from_s3.return_value = {"success": {"data": parquet_bytes}}
 
@@ -86,7 +86,7 @@ class TestExtractDataFramesFromEvent:
         parquet_bytes = buffer.getvalue()
 
         with patch(
-            "src.lambdas.transform_lambda.utilities.extract_dataframe_from_event.get_file_from_s3_bucket"
+            "src.utilities.transform_lambda_utils.extract_dataframe_from_event.get_file_from_s3_bucket"
         ) as mock_get_file_from_s3:
             mock_get_file_from_s3.return_value = {"success": {"data": parquet_bytes}}
 
@@ -101,7 +101,7 @@ class TestExtractDataFramesFromEvent:
     @pytest.mark.it("Should raise an exception if the Parquet data is invalid")
     def test_raises_exception_on_invalid_parquet_data(self, test_mock_event):
         with patch(
-            "src.lambdas.transform_lambda.utilities.extract_dataframe_from_event.get_file_from_s3_bucket"
+            "src.utilities.transform_lambda_utils.extract_dataframe_from_event.get_file_from_s3_bucket"
         ) as mock_get_file_from_s3:
             mock_get_file_from_s3.return_value = {
                 "success": {"data": b"not-a-parquet-file"}
@@ -113,7 +113,7 @@ class TestExtractDataFramesFromEvent:
     @pytest.mark.it("Should raise an exception if the Parquet file is empty")
     def test_raises_exception_on_empty_parquet_file(self, test_mock_event):
         with patch(
-            "src.lambdas.transform_lambda.utilities.extract_dataframe_from_event.get_file_from_s3_bucket"
+            "src.utilities.transform_lambda_utils.extract_dataframe_from_event.get_file_from_s3_bucket"
         ) as mock_get_file_from_s3:
             mock_get_file_from_s3.return_value = {"success": {"data": b""}}
 
@@ -136,7 +136,7 @@ class TestExtractDataFramesFromEvent:
     @pytest.mark.it("Should raise an exception if S3 returns an error response")
     def test_raises_exception_on_s3_error_response(self, test_mock_event):
         with patch(
-            "src.lambdas.transform_lambda.utilities.extract_dataframe_from_event.get_file_from_s3_bucket"
+            "src.utilities.transform_lambda_utils.extract_dataframe_from_event.get_file_from_s3_bucket"
         ) as mock_get_file_from_s3:
             mock_get_file_from_s3.return_value = {
                 "error": {"message": "File not found"}

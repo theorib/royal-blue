@@ -2,7 +2,7 @@ import os
 
 from get_file_from_s3_bucket import get_file_from_s3_bucket
 
-from src.lambdas.transform_lambda.utilities.convert_parquet_to_dataframe import (
+from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
     parquet_to_dataframe,
 )
 from utilities.state.get_current_state import get_current_state

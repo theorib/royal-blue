@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def dim_staff_dataframe(dataframes: dict):
     staff_df = dataframes.get("staff")
     departments_df = dataframes.get("department")

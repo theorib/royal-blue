@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 # from pandas.testing import assert_frame_equal
-from src.lambdas.transform_lambda.dimensions.dim_staff_transform import (
+from src.utilities.dimensions.dim_staff_transform import (
     dim_staff_dataframe,
 )
 

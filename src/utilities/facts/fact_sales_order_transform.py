@@ -14,7 +14,7 @@ def fact_sales_order_dataframe(extracted_dataframes: dict) -> pd.DataFrame:
     -------
     pd.DataFrame
         The transformed fact_sales_order DataFrame with selected fields.
-    
+
     Raises
     ------
     ValueError
@@ -35,7 +35,7 @@ def fact_sales_order_dataframe(extracted_dataframes: dict) -> pd.DataFrame:
         "units_sold",
         "unit_price",
         "currency_id",
-        "agreed_delivery_date"
+        "agreed_delivery_date",
     ]
 
     if not set(required_columns).issubset(sales_df.columns):

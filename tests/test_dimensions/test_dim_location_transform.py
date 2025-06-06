@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.lambdas.transform_lambda.dimensions.dim_location_transform import (
+from src.utilities.dimensions.dim_location_transform import (
     dim_location_dataframe,
 )
 
