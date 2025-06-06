@@ -9,7 +9,7 @@ from src.utilities.extract_lambda_utils import (
     create_data_frame_from_list,
     get_last_updated_from_raw_table_data,
     initialize_table_state,
-    create_parquet_metadata
+    create_parquet_metadata,
 )
 
 
@@ -158,9 +158,11 @@ class TestGetLastUpdatedFromRawTableData:
             2025, 5, 5, 5, 5, 5, 3
         )
 
-@pytest.mark.it("check should initialize a new table entry if it does not exist in current_state.")
+
+@pytest.mark.it(
+    "check should initialize a new table entry if it does not exist in current_state."
+)
 def test_initialize_table_state_adds_new_table():
-   
     current_state = {"ingest_state": {}}
     table_name = "test_table"
 
@@ -170,14 +172,16 @@ def test_initialize_table_state_adds_new_table():
     assert result["ingest_state"][table_name]["last_updated"] is None
     assert result["ingest_state"][table_name]["ingest_log"] == []
 
-@pytest.mark.it("Should return the original state unchanged if table_name already exists.")
+
+@pytest.mark.it(
+    "Should return the original state unchanged if table_name already exists."
+)
 def test_initialize_table_state_returns_unchanged_if_exists():
-    
     current_state = {
         "ingest_state": {
             "existing_table": {
                 "last_updated": "2025-06-05T10:00:00",
-                "ingest_log": ["row1", "row2"]
+                "ingest_log": ["row1", "row2"],
             }
         }
     }
@@ -186,9 +190,11 @@ def test_initialize_table_state_returns_unchanged_if_exists():
 
     assert result == current_state
 
-@pytest.mark.it("Should generate a filename and key from a given datetime and table name.")
+
+@pytest.mark.it(
+    "Should generate a filename and key from a given datetime and table name."
+)
 def test_create_parquet_metadata_returns_correct_filename_and_key():
-    
     dt = datetime(2025, 6, 13, 10, 35, 20, 12345)
     table_name = "currency"
 
