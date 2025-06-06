@@ -55,3 +55,29 @@ module "extract_lambda" {
   DB_DATABASE = var.DB_DATABASE
   DB_PORT     = var.DB_PORT
 }
+
+module "transform_lambda" {
+  source         = "./modules/transform_lambda"
+  python_runtime = var.python_runtime
+  s3_bucket = {
+    arn = aws_s3_bucket.lambda_source_code.arn
+    id  = aws_s3_bucket.lambda_source_code.id
+  }
+  lambda_layers_bucket = {
+    arn = aws_s3_bucket.extract_lambda_layers.arn
+    id  = aws_s3_bucket.extract_lambda_layers.id
+  }
+  ingest_zone_bucket = {
+    arn = aws_s3_bucket.ingest_zone.arn
+    id  = aws_s3_bucket.ingest_zone.id
+  }
+  lambda_state_bucket = {
+    arn = aws_s3_bucket.lambda_state.arn
+    id  = aws_s3_bucket.lambda_state.id
+  }
+
+  process_zone_bucket = {
+    arn = aws_s3_bucket.process_zone.arn
+    id  = aws_s3_bucket.process_zone.id
+  }
+}
