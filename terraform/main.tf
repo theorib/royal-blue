@@ -18,7 +18,8 @@ module "etl_state_machine" {
   type   = var.step_function_type
 
   lambda_arns = {
-    extract = module.extract_lambda.lambda_function_arn
+    extract   = module.extract_lambda.lambda.arn
+    transform = module.transform_lambda.lambda.arn
   }
 }
 
