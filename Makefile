@@ -6,7 +6,7 @@ help:  ## Display this help
 .PHONY: uv
 uv:  ## Install uv if it's not present
 	@command -v uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
-
+	
 .PHONY: sync
 sync: uv ## Install dependencies
 	uv sync
@@ -44,4 +44,9 @@ safe: ## Run Bandit security scan
 .PHONY: checks
 checks: fix-all cov safe ## Run all checks
 
+.PHONY: set-tfvars
+set-tfvars:  ## Copy .env variables to terraform/terraform.auto.tfvars file
+	./set-tfvars.sh
 
+.PHONY: setup
+setup: sync set-tfvars checks ## Runs all checks and instalation scripts to get your project running
