@@ -20,7 +20,7 @@ resource "aws_s3_object" "lambda_layer_object" {
   bucket = var.lambda_layers_bucket.id
   key    = var.layer_zip_filename
   source = data.archive_file.layer.output_path
-  etag   = data.archive_file.layer.output_sha256
+  etag   = data.archive_file.layer.output_md5
 }
 
 resource "aws_lambda_layer_version" "lambda_layer" {

@@ -38,7 +38,7 @@ resource "aws_s3_object" "lambda_src_object" {
   bucket     = var.s3_bucket.id
   key        = module.dependency_layer.layer_zip_filename
   source     = "${path.root}/../dist/${var.function_name}.zip"
-  etag       = filebase64sha256("${path.root}/../dist/${var.function_name}.zip")
+  etag       = filemd5("${path.root}/../dist/${var.function_name}.zip")
   depends_on = [var.s3_bucket]
 }
 
