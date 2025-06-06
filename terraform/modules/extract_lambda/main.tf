@@ -23,7 +23,7 @@ resource "aws_lambda_function" "lambda" {
   depends_on = [module.dependency_layer.layer_build_resource, aws_s3_object.lambda_src_object, module.dependency_layer.lambda_layer_object]
 }
 
-resource "null_resource" "create_extract_lambda_build" {
+resource "null_resource" "run_lambda_build_script" {
   provisioner "local-exec" {
     working_dir = "${path.root}/../"
     command     = "./build_extract_lambda_zip.sh"
