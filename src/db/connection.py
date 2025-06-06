@@ -2,11 +2,8 @@ import logging
 import os
 from typing import Any
 
-from dotenv import load_dotenv
 from psycopg import Connection, Error, connect
 from psycopg.rows import DictRow, dict_row
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

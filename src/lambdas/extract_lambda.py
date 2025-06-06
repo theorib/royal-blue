@@ -2,13 +2,14 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pformat, pprint
+from pprint import pformat
 
 import boto3
+import orjson
 
 from src.db.connection import connect_db
 from src.db.db_helpers import get_table_data, get_totesys_table_names
-from src.lambdas.extract_lambda.extract_lambda_utils import (
+from src.utilities.extract_lambda_utils import (
     create_data_frame_from_list,
     create_parquet_metadata,
     get_last_updated_from_raw_table_data,
@@ -152,7 +153,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
         logger.info("Result of extraction process:\n%s", pformat(result))
         logger.info("End of extraction process for all tables")
-        return result
+        return orjson.dumps(result)
 
     except Exception as err:
         logger.critical(err)
