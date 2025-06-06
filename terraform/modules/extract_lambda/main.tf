@@ -11,11 +11,11 @@ resource "aws_lambda_function" "lambda" {
     variables = {
       INGEST_ZONE_BUCKET_NAME  = var.ingest_zone_bucket.id
       LAMBDA_STATE_BUCKET_NAME = var.lambda_state_bucket.id
-      DB_USER                  = var.DB_USER
-      DB_PASSWORD              = var.DB_PASSWORD
-      DB_HOST                  = var.DB_HOST
-      DB_DATABASE              = var.DB_DATABASE
-      DB_PORT                  = var.DB_PORT
+      TOTESYS_DB_USER          = var.TOTESYS_DB_USER
+      TOTESYS_DB_PASSWORD      = var.TOTESYS_DB_PASSWORD
+      TOTESYS_DB_HOST          = var.TOTESYS_DB_HOST
+      TOTESYS_DB_DATABASE      = var.TOTESYS_DB_DATABASE
+      TOTESYS_DB_PORT          = var.TOTESYS_DB_PORT
     }
   }
 

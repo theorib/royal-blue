@@ -27,11 +27,11 @@ def connect_db() -> Connection[DictRow]:
         psycopg.Error: If a database connection error occurs.
         Exception: For any other unexpected exceptions during connection.
     """
-    user = os.getenv("DB_USER")
-    password = os.getenv("DB_PASSWORD")
-    host = os.getenv("DB_HOST")
-    dbname = os.getenv("DB_DATABASE")
-    port = os.getenv("DB_PORT")
+    user = os.getenv("TOTESYS_DB_USER")
+    password = os.getenv("TOTESYS_DB_PASSWORD")
+    host = os.getenv("TOTESYS_DB_HOST")
+    dbname = os.getenv("TOTESYS_DB_DATABASE")
+    port = os.getenv("TOTESYS_DB_PORT")
     try:
         conn: Connection[DictRow] = connect(
             f"user={user} password={password} host={host} dbname={dbname} port={int(port or 0000)}",
