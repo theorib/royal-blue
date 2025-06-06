@@ -13,7 +13,7 @@ variable "s3_bucket" {
     arn = string
   })
 }
-variable "extract_lambda_layers_bucket" {
+variable "lambda_layers_bucket" {
   description = "Lambda S3 layers bucket ARN and ID."
   type = object({
     id  = string

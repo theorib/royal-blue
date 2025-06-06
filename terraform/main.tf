@@ -36,7 +36,7 @@ module "extract_lambda" {
     arn = aws_s3_bucket.lambda_source_code.arn
     id  = aws_s3_bucket.lambda_source_code.id
   }
-  extract_lambda_layers_bucket = {
+  lambda_layers_bucket = {
     arn = aws_s3_bucket.extract_lambda_layers.arn
     id  = aws_s3_bucket.extract_lambda_layers.id
   }

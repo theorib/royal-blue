@@ -1,4 +1,4 @@
-resource "aws_lambda_function" "extract_lambda" {
+resource "aws_lambda_function" "lambda" {
   s3_bucket        = var.s3_bucket.id
   s3_key           = var.extract_layer_zip_filename
   function_name    = var.function_name

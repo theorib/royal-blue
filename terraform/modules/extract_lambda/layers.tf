@@ -23,7 +23,7 @@ data "archive_file" "extract_layer" {
 resource "aws_s3_object" "lambda_layer_object" {
   # for_each = { for lib in var.libraries : lib.name => lib }
 
-  bucket = var.extract_lambda_layers_bucket.id
+  bucket = var.lambda_layers_bucket.id
   key    = var.extract_layer_zip_filename
   source = data.archive_file.extract_layer.output_path
   etag   = data.archive_file.extract_layer.output_sha256
@@ -31,7 +31,7 @@ resource "aws_s3_object" "lambda_layer_object" {
 
 resource "aws_lambda_layer_version" "extract_lambda" {
   layer_name          = "royal_blue_layer"
-  s3_bucket           = var.extract_lambda_layers_bucket.id
+  s3_bucket           = var.lambda_layers_bucket.id
   s3_key              = aws_s3_object.lambda_layer_object.key
   compatible_runtimes = [var.python_runtime]
   # filename            = data.archive_file.extract_layer.output_path
