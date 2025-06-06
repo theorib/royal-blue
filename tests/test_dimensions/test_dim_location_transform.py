@@ -89,7 +89,7 @@ class TestDimLocationDataframe:
 
     @pytest.mark.it("Should raise an error if a column has the wrong invalid data type")
     def test_dim_address_incorrect_data_type(self, mock_address_df):
-        mock_address_df["city"] = [{"a": 1}, {"b": 2 }]
+        mock_address_df["city"] = [{"a": 1}, {"b": 2}]
         test_extracted_dataframes = {"address": mock_address_df}
 
         with pytest.raises(ValueError, match="Error creating dim_location"):
