@@ -7,9 +7,9 @@ import pytest
 from src.utilities.custom_errors import InvalidEmptyList
 from src.utilities.extract_lambda_utils import (
     create_data_frame_from_list,
+    create_parquet_metadata,
     get_last_updated_from_raw_table_data,
     initialize_table_state,
-    create_parquet_metadata,
 )
 
 
