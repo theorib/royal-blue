@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def dim_currency_dataframe(extracted_dataframes: dict):
+def dim_currency_dataframe(dataframes: dict):
     try:
         currency_lookup = {
             "USD": "US Dollar",
@@ -25,7 +25,7 @@ def dim_currency_dataframe(extracted_dataframes: dict):
             "RUB": "Russian Ruble",
             "TRY": "Turkish Lira",
         }
-        currency_df = extracted_dataframes.get("currency")
+        currency_df = dataframes.get("currency")
         if currency_df is None:
             raise ValueError("Error: 'currency' DataFrame is missing.")
 
