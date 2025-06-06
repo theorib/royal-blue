@@ -1,8 +1,8 @@
 resource "aws_lambda_function" "lambda" {
   s3_bucket        = var.s3_bucket.id
-  s3_key           = var.extract_layer_zip_filename
+  s3_key           = module.dependency_layer.layer_zip_filename
   function_name    = var.function_name
-  handler          = "src.lambdas.extract_lambda.lambda_handler"
+  handler          = "src.lambdas.${var.function_name}.lambda_handler"
   runtime          = var.python_runtime
   source_code_hash = filebase64sha256("${path.root}/../dist/${var.function_name}.zip")
   role             = aws_iam_role.iam_for_lambda.arn
@@ -19,8 +19,8 @@ resource "aws_lambda_function" "lambda" {
     }
   }
 
-  layers     = [aws_lambda_layer_version.extract_lambda.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python313:1"]
-  depends_on = [resource.null_resource.create_extract_lambda_build, aws_s3_object.lambda_src_object, aws_s3_object.lambda_layer_object]
+  layers     = [module.dependency_layer.aws_lambda_layer_version.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python313:1"]
+  depends_on = [module.dependency_layer.layer_build_resource, aws_s3_object.lambda_src_object, module.dependency_layer.lambda_layer_object]
 }
 
 resource "null_resource" "create_extract_lambda_build" {
@@ -36,12 +36,17 @@ resource "null_resource" "create_extract_lambda_build" {
 
 resource "aws_s3_object" "lambda_src_object" {
   bucket     = var.s3_bucket.id
-  key        = var.extract_layer_zip_filename
+  key        = module.dependency_layer.layer_zip_filename
   source     = "${path.root}/../dist/${var.function_name}.zip"
   etag       = filebase64sha256("${path.root}/../dist/${var.function_name}.zip")
   depends_on = [var.s3_bucket]
 }
 
-
-
-
+module "dependency_layer" {
+  source         = "../lambdas_layer"
+  python_runtime = var.python_runtime
+  lambda_layers_bucket = {
+    arn = var.lambda_layers_bucket.arn
+    id  = var.lambda_layers_bucket.id
+  }
+}
