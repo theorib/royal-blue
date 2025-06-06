@@ -13,13 +13,13 @@ logger.setLevel(logging.INFO)
 
 def create_data_frame_from_list(data: List[dict]) -> pd.DataFrame:
     """
-    Converts a non-empty list of dictionaries into a pandas DataFrame.
+    Convert a list of dictionaries into a pandas DataFrame.
 
     Args:
-        data (List[dict]): The list of dictionary records to convert.
+        data (List[dict]): A list of dictionaries representing table rows.
 
     Returns:
-        pd.DataFrame: The resulting DataFrame.
+        pd.DataFrame: A DataFrame created from the input list.
 
     Raises:
         InvalidEmptyList: If the input list is empty.
@@ -32,13 +32,13 @@ def create_data_frame_from_list(data: List[dict]) -> pd.DataFrame:
 
 def get_last_updated_from_raw_table_data(rows: List[dict]) -> datetime:
     """
-    Extracts the most recent datetime from the 'last_updated' field in a list of dictionaries.
+    Extract the latest datetime from the 'last_updated' field of a list of records.
 
     Args:
-        rows (List[dict]): The raw table data with datetime entries under the 'last_updated' key.
+        rows (List[dict]): A list of dictionaries, each representing a row of data.
 
     Returns:
-        datetime: The latest 'last_updated' datetime found.
+        datetime: The most recent datetime found in the 'last_updated' field.
 
     Raises:
         InvalidEmptyList: If the input list is empty.
@@ -58,15 +58,14 @@ def get_last_updated_from_raw_table_data(rows: List[dict]) -> datetime:
 
 def initialize_table_state(current_state, table_name):
     """
-    Ensures the ingest state for a given table exists in the current state dictionary.
-    If not present, it initializes the table with default metadata.
+    Initialize the state for a table if it does not already exist in the current ingest state.
 
     Args:
-        current_state (dict): The current state containing ingest information.
+        current_state (dict): The current ingest state dictionary.
         table_name (str): The name of the table to initialize.
 
     Returns:
-        dict: The updated or unchanged state dictionary.
+        dict: A new state dictionary with the table initialized if it wasn't already present.
     """
     if current_state["ingest_state"].get(table_name):
         return current_state
@@ -83,14 +82,14 @@ def create_parquet_metadata(
     new_table_data_last_updated: datetime, table_name: str
 ) -> tuple[str, str]:
     """
-    Generates a filename and S3 key for storing a Parquet file based on a timestamp.
+    Generate a filename and storage key for a parquet file based on timestamp and table name.
 
     Args:
-        new_table_data_last_updated (datetime): The timestamp to include in the metadata.
-        table_name (str): The name of the table the data belongs to.
+        new_table_data_last_updated (datetime): The datetime indicating when the table data was last updated.
+        table_name (str): The name of the table.
 
     Returns:
-        tuple[str, str]: A tuple containing the filename and the S3 key.
+        tuple[str, str]: A tuple containing the parquet filename and the storage key.
     """
     year = new_table_data_last_updated.year
     month = new_table_data_last_updated.month
