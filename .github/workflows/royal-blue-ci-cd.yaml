@@ -89,8 +89,9 @@ jobs:
       
       - name: run pre-terraform build scripts
         run: ./build_extract_lambda_zip.sh |
-          ./build_lambda_layer.sh |
-          ./build_transform_lambda_zip.sh
+          ./build_transform_lambda_zip.sh |
+          ./build_load_lambda_zip.sh |
+          ./build_lambda_layer.sh 
       - name: terraform format
         working-directory: terraform
         run: terraform fmt -recursive
