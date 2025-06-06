@@ -22,7 +22,7 @@ resource "aws_lambda_function" "lambda" {
 resource "null_resource" "run_lambda_build_script" {
   provisioner "local-exec" {
     working_dir = "${path.root}/../"
-    command     = "./build_transform_lambda_zip.sh"
+    command     = "./build_${var.function_name}_zip.sh"
   }
   triggers = {
     lock_file_hash = filebase64sha256("${path.root}/../uv.lock")
