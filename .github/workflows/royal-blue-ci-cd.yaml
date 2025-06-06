@@ -90,7 +90,19 @@ jobs:
         run: terraform init
       - name: terraform plan
         working-directory: terraform
+        env:
+          TF_VAR_DB_USER: ${{secrets.DB_USER}}
+          TF_VAR_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          TF_VAR_DB_HOST: ${{secrets.DB_HOST}}
+          TF_VAR_DB_DATABASE: ${{secrets.DB_DATABASE}}
+          TF_VAR_DB_PORT: ${{secrets.DB_PORT}}
         run: terraform plan
       - name: terraform apply
         working-directory: terraform
+        env:
+          TF_VAR_DB_USER: ${{secrets.DB_USER}}
+          TF_VAR_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          TF_VAR_DB_HOST: ${{secrets.DB_HOST}}
+          TF_VAR_DB_DATABASE: ${{secrets.DB_DATABASE}}
+          TF_VAR_DB_PORT: ${{secrets.DB_PORT}}
         run: terraform apply -auto-approve
