@@ -20,6 +20,7 @@ module "etl_state_machine" {
   lambda_arns = {
     extract   = module.extract_lambda.lambda.arn
     transform = module.transform_lambda.lambda.arn
+    load      = module.load_lambda.lambda.arn
   }
 }
 
@@ -81,4 +82,32 @@ module "transform_lambda" {
     arn = aws_s3_bucket.process_zone.arn
     id  = aws_s3_bucket.process_zone.id
   }
+}
+
+module "load_lambda" {
+  source         = "./modules/load_lambda"
+  python_runtime = var.python_runtime
+  s3_bucket = {
+    arn = aws_s3_bucket.lambda_source_code.arn
+    id  = aws_s3_bucket.lambda_source_code.id
+  }
+  lambda_layers_bucket = {
+    arn = aws_s3_bucket.extract_lambda_layers.arn
+    id  = aws_s3_bucket.extract_lambda_layers.id
+  }
+  lambda_state_bucket = {
+    arn = aws_s3_bucket.lambda_state.arn
+    id  = aws_s3_bucket.lambda_state.id
+  }
+
+  process_zone_bucket = {
+    arn = aws_s3_bucket.process_zone.arn
+    id  = aws_s3_bucket.process_zone.id
+  }
+
+  DATAWAREHOUSE_DB_USER     = var.DATAWAREHOUSE_DB_USER
+  DATAWAREHOUSE_DB_PASSWORD = var.DATAWAREHOUSE_DB_PASSWORD
+  DATAWAREHOUSE_DB_HOST     = var.DATAWAREHOUSE_DB_HOST
+  DATAWAREHOUSE_DB_DATABASE = var.DATAWAREHOUSE_DB_DATABASE
+  DATAWAREHOUSE_DB_PORT     = var.DATAWAREHOUSE_DB_PORT
 }
