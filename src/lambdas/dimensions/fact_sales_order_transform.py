@@ -2,24 +2,45 @@ import pandas as pd
 
 
 def fact_sales_order_dataframe(extracted_dataframes: dict) -> pd.DataFrame:
+    """
+    Transforms the extracted 'sales_order' data into a fact_sales_order DataFrame.
 
-    sales_order_df = extracted_dataframes.get("sales_order")
+    Parameters
+    ----------
+    extracted_dataframes : dict
+        A dictionary of extracted raw tables keyed by table name.
 
-    if sales_order_df is None:
-        raise ValueError("Error: Missing sales_order table.")
+    Returns
+    -------
+    pd.DataFrame
+        The transformed fact_sales_order DataFrame with selected fields.
+    
+    Raises
+    ------
+    ValueError
+        If 'sales_order' is missing or required columns are not present.
+    """
+    sales_df = extracted_dataframes.get("sales_order")
 
-    try:
-        fact_sales_order = sales_order_df[[
-            "design_id", 
-            "design_name", 
-            "file_location", 
-            "file_name"]
-        ].drop_duplicates()
+    if sales_df is None:
+        raise ValueError("Missing 'sales_order' table from extracted data.")
 
-        return fact_sales_order
+    required_columns = [
+        "sales_order_id",
+        "created_at",
+        "last_updated",
+        "design_id",
+        "staff_id",
+        "counterparty_id",
+        "units_sold",
+        "unit_price",
+        "currency_id",
+        "agreed_delivery_date"
+    ]
 
-    except Exception as e:
-        raise ValueError(f"Error creating fact_sales_order: {e}")
+    if not set(required_columns).issubset(sales_df.columns):
+        missing = set(required_columns) - set(sales_df.columns)
+        raise ValueError(f"Missing columns in 'sales_order': {missing}")
 
-# merge(): Combine two Series or DataFrame objects with SQL-style joining
-# mg = pd.merge(df1, df2, on="col3", how="left")
+    fact_sales = sales_df[required_columns].copy()
+    return fact_sales
