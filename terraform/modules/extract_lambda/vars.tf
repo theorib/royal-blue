@@ -20,7 +20,7 @@ variable "lambda_layers_bucket" {
     arn = string
   })
 }
-variable "ingestion_zone_bucket" {
+variable "ingest_zone_bucket" {
   description = "Lambda S3 ingestion zone bucket ARN and ID. To be used internaly by lambda's source code via terraform injected environment variables and to create IAM permissions"
   type = object({
     id  = string

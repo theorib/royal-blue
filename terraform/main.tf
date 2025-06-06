@@ -40,9 +40,9 @@ module "extract_lambda" {
     arn = aws_s3_bucket.extract_lambda_layers.arn
     id  = aws_s3_bucket.extract_lambda_layers.id
   }
-  ingestion_zone_bucket = {
-    arn = aws_s3_bucket.ingestion_zone.arn
-    id  = aws_s3_bucket.ingestion_zone.id
+  ingest_zone_bucket = {
+    arn = aws_s3_bucket.ingest_zone.arn
+    id  = aws_s3_bucket.ingest_zone.id
   }
   lambda_state_bucket = {
     arn = aws_s3_bucket.lambda_state.arn

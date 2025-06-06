@@ -8,13 +8,15 @@ resource "aws_lambda_function" "lambda" {
   role             = aws_iam_role.iam_for_lambda.arn
   timeout          = 200
   environment {
-    variables = { INGEST_ZONE_BUCKET_NAME = var.ingestion_zone_bucket.id
+    variables = {
+      INGEST_ZONE_BUCKET_NAME  = var.ingest_zone_bucket.id
       LAMBDA_STATE_BUCKET_NAME = var.lambda_state_bucket.id
       DB_USER                  = var.DB_USER
       DB_PASSWORD              = var.DB_PASSWORD
       DB_HOST                  = var.DB_HOST
       DB_DATABASE              = var.DB_DATABASE
-    DB_PORT = var.DB_PORT }
+      DB_PORT                  = var.DB_PORT
+    }
   }
 
   layers     = [aws_lambda_layer_version.extract_lambda.arn, "arn:aws:lambda:eu-west-2:336392948345:layer:AWSSDKPandas-Python313:1"]
