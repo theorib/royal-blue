@@ -32,6 +32,14 @@ module "etl_scheduler" {
 module "extract_lambda" {
   source         = "./modules/extract_lambda"
   python_runtime = var.python_runtime
+  s3_bucket = {
+    arn = aws_s3_bucket.lambda_source_code.arn
+    id  = aws_s3_bucket.lambda_source_code.id
+  }
+  extract_lambda_layers_bucket = {
+    arn = aws_s3_bucket.extract_lambda_layers.arn
+    id  = aws_s3_bucket.extract_lambda_layers.id
+  }
   ingestion_zone_bucket = {
     arn = aws_s3_bucket.ingestion_zone.arn
     id  = aws_s3_bucket.ingestion_zone.id
@@ -40,6 +48,7 @@ module "extract_lambda" {
     arn = aws_s3_bucket.lambda_state.arn
     id  = aws_s3_bucket.lambda_state.id
   }
+
   DB_USER     = var.DB_USER
   DB_PASSWORD = var.DB_PASSWORD
   DB_HOST     = var.DB_HOST

@@ -1,9 +1,8 @@
 output "extract_lambda" {
-  value = module.extract_lambda
-
+  value = aws_lambda_function.extract_lambda
 }
 
 output "lambda_function_arn" {
   description = "Expose ARN from nested create_lambda module"
-  value       = module.extract_lambda.lambda_function_arn
+  value       = aws_lambda_function.extract_lambda.arn
 }
