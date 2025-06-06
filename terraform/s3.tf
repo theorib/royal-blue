@@ -1,10 +1,10 @@
 resource "aws_s3_bucket" "ingest_zone" {
-  bucket_prefix = "ingestion-zone-"
+  bucket_prefix = "ingest-zone-"
   force_destroy = true
 }
 
-resource "aws_s3_bucket" "processed_zone" {
-  bucket_prefix = "processed-zone-"
+resource "aws_s3_bucket" "process_zone" {
+  bucket_prefix = "process-zone-"
   force_destroy = true
 }
 
