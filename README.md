@@ -37,17 +37,24 @@ We are using [uv](https://docs.astral.sh/uv/) to manage python installation, pyt
     ```
 
 ## Running python scripts locally
-Since we are using `uv` to manage this project, instead of running scripts with the `python script-name.py` command we use uv's flavour of it.
+Since we are using `uv` to manage this project, instead of running scripts with the `python script-name.py` we run then using the `uv run` command.
 
 1. Activate the virtual environment:
 ```bash
 source .venv/bin/activate
 ```
-2. Export the current directory as your `PYTHONPATH`
+
+2. Export the current directory to your `PYTHONPATH`:
 ```bash
 export PYTHONPATH=$(pwd)
 ```
-3. Run scripts using `uv`, examples:
+
+3. Tell `uv` where to find your project's environment variables from your `.env` file so they are available when running scripts locally: 
+```bash
+export UV_ENV_FILE=.env  
+```
+
+4. Run scripts using `uv run`, examples:
 ```bash
 uv run src/lambdas/extract_lambda.py
 ```
