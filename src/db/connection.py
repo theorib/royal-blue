@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Literal
 
 from psycopg import Connection, Error, connect
 from psycopg.rows import DictRow, dict_row
@@ -8,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def connect_db(db_source: str) -> Connection[DictRow]:
+def connect_db(db_source: Literal["TOTESYS", "DATAWAREHOUSE"]) -> Connection[DictRow]:
     if db_source not in ["TOTESYS", "DATAWAREHOUSE"]:
         raise ValueError(
             "db_source invalid, must be either 'TOTESYS' or 'DATAWAREHOUSE'"
