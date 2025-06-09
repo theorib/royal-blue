@@ -1,14 +1,16 @@
 import logging
 from copy import copy
 from datetime import datetime
-from unittest.mock import MagicMock
+from pprint import pprint
+from unittest.mock import MagicMock, patch
 
 import pytest
-from psycopg import Connection, errors
+from psycopg import Connection, Error, errors
 
 from src.db.connection import connect_db
 from src.db.db_helpers import (
     filter_out_values,
+    get_table_data,
     get_table_last_updated_timestamp,
     get_totesys_table_names,
 )
@@ -165,3 +167,67 @@ class TestGetTableLastUpdatedTimestamp:
 
         assert result.get("error")
         assert result["error"]["message"] == "invalid database response"
+
+
+@pytest.mark.describe(
+    "Test get_table_data (currently these are mostly integration tests)"
+)
+class TestGetTableData:
+    # @pytest.mark.skip
+    @pytest.mark.it(
+        "check that it returns a list of dictionaries with expected keys and values"
+    )
+    def test_list_of_dict(self):
+        conn = connect_db()
+
+        result = get_table_data(conn, "currency")
+
+        assert isinstance(result, list)
+        for item in result:
+            assert isinstance(item, dict)
+            assert isinstance(item["currency_id"], int)
+            assert isinstance(item["currency_code"], str)
+            assert isinstance(item["created_at"], datetime)
+            assert isinstance(item["last_updated"], datetime)
+
+    # @pytest.mark.skip
+    @pytest.mark.it(
+        "check that it returns an empty list if are no matching results in the database (searching for results within a date in the future)"
+    )
+    def test_empty_list(self):
+        conn = connect_db()
+
+        result = get_table_data(
+            conn, "currency", datetime.fromisoformat("2100-01-01 01:01:01.001")
+        )
+
+        assert result == []
+
+    # @pytest.mark.skip
+    @pytest.mark.it(
+        "check that it raises an exception if querying results for a table that does not exist"
+    )
+    def test_exception_table_not_exists(self):
+        conn = connect_db()
+        with pytest.raises(Error) as err:
+            get_table_data(conn, "non-existing-table-name")
+        assert err.typename == "UndefinedTable"
+
+    # @pytest.mark.skip
+    @pytest.mark.it(
+        "check that it raises an error if an invalid datetime object is passed to last_updated "
+    )
+    def test_invalid_last_updated(self):
+        conn = connect_db()
+        with pytest.raises(Error) as err:
+            get_table_data(conn, "currency", "123")  # type: ignore
+        assert err.typename == "InvalidDatetimeFormat"
+
+    # @pytest.mark.skip
+    @patch("src.db.db_helpers.get_table_data")
+    @pytest.mark.it("test description")
+    def test_(self, mock_get_table_data):
+        conn = connect_db()
+        get_table_data(conn, "currency")
+        pprint(dir(mock_get_table_data))
+        mock_get_table_data.assert_called_once_with(conn, "currency")
