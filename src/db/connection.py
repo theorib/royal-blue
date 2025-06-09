@@ -45,25 +45,3 @@ def connect_db() -> Connection[DictRow]:
     except Exception as error:
         logger.error(error)
         raise error
-
-
-def close_db(conn: Connection[Any]) -> None:
-    """
-    Safely close a PostgreSQL database connection.
-
-    Args:
-        conn (Connection[Any]): A psycopg connection object.
-
-    Raises:
-        psycopg.Error: If an error occurs while closing the connection.
-        Exception: For any other unexpected exceptions.
-    """
-    try:
-        if conn:
-            conn.close()
-    except Error as error:
-        logger.error(error)
-        raise error
-    except Exception as error:
-        logger.error(error)
-        raise error
