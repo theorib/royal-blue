@@ -8,29 +8,16 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def connect_db() -> Connection[DictRow]:
-    """
-    Establish a connection to a PostgreSQL database using environment variables.
+def connect_db(db_source: str) -> Connection[DictRow]:
 
-    Environment Variables:
-        DB_USER (str): Database username.
-        DB_PASSWORD (str): Database password.
-        DB_HOST (str): Hostname of the database.
-        DB_DATABASE (str): Name of the database.
-        DB_PORT (str): Port number (optional, defaults to 0000 if not set).
-
-    Returns:
-        Connection[DictRow]: A psycopg connection object with dictionary row factory enabled.
-
-    Raises:
-        psycopg.Error: If a database connection error occurs.
-        Exception: For any other unexpected exceptions during connection.
-    """
-    user = os.getenv("TOTESYS_DB_USER")
-    password = os.getenv("TOTESYS_DB_PASSWORD")
-    host = os.getenv("TOTESYS_DB_HOST")
-    dbname = os.getenv("TOTESYS_DB_DATABASE")
-    port = os.getenv("TOTESYS_DB_PORT")
+    if db_source not in ["TOTESYS_DB_DATABASE", "DATAWAREHOUSE_DB_DATABASE"]:
+        raise ValueError("db_source invalid, must be either 'TOTESYS_DB_DATABASE' or 'DATAWAREHOUSE_DB_DATABASE'")
+                         
+    user = os.getenv("f{db_source}_DB_USER")
+    password = os.getenv("f{db_source}_PASSWORD")
+    host = os.getenv("f{db_source}_HOST")
+    dbname = os.getenv("f{db_source}_DATABASE")
+    port = os.getenv("f{db_source}_PORT")
     try:
         conn: Connection[DictRow] = connect(
             f"user={user} password={password} host={host} dbname={dbname} port={int(port or 0000)}",
