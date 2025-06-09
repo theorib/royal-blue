@@ -1,6 +1,5 @@
 import logging
 import os
-from typing import Any
 
 from psycopg import Connection, Error, connect
 from psycopg.rows import DictRow, dict_row
