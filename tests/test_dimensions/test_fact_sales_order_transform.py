@@ -1,25 +1,23 @@
 import pandas as pd
 import pytest
 
-from src.utilities.facts.fact_sales_order_transform import fact_sales_order_dataframe
+from src.utilities.facts.fact_sales_order_transform import get_fact_sales_order_df
 
 
 @pytest.fixture
 def mock_sales_order_df():
-    return pd.DataFrame(
-        {
-            "sales_order_id": [1],
-            "created_at": ["2025-06-01T10:30:00"],
-            "last_updated": ["2025-06-02T15:45:00"],
-            "design_id": [101],
-            "staff_id": [501],
-            "counterparty_id": [301],
-            "units_sold": [10],
-            "unit_price": [5.99],
-            "currency_id": [1],
-            "agreed_delivery_date": ["2025-06-10"],
-        }
-    )
+    return pd.DataFrame({
+        "sales_order_id": [1],
+        "created_at": ["2025-06-01T10:30:00"],
+        "last_updated": ["2025-06-02T15:45:00"],
+        "design_id": [101],
+        "staff_id": [501],
+        "counterparty_id": [301],
+        "units_sold": [10],
+        "unit_price": [5.99],
+        "currency_id": [1],
+        "agreed_delivery_date": ["2025-06-10"],
+    })
 
 
 @pytest.mark.describe("fact_sales_order_dataframe Transformation Function")
@@ -29,7 +27,7 @@ class TestFactSalesOrder:
     )
     def test_fact_sales_order_success(self, mock_sales_order_df):
         df = {"sales_order": mock_sales_order_df}
-        result = fact_sales_order_dataframe(df)
+        result = get_fact_sales_order_df(df)
 
         expected_columns = [
             "sales_order_id",
@@ -58,21 +56,19 @@ class TestFactSalesOrder:
         with pytest.raises(
             ValueError, match="Missing 'sales_order' table from extracted data."
         ):
-            fact_sales_order_dataframe(df)
+            get_fact_sales_order_df(df)
 
     @pytest.mark.it(
         "Should raise ValueError if required columns are missing from 'sales_order'"
     )
     def test_fact_sales_order_missing_column(self):
-        broken_sales_order_df = pd.DataFrame(
-            {
-                "sales_order_id": [1],
-                "design_id": [101],
-                "staff_id": [501],
-            }
-        )
+        broken_sales_order_df = pd.DataFrame({
+            "sales_order_id": [1],
+            "design_id": [101],
+            "staff_id": [501],
+        })
 
         broken_df = {"sales_order": broken_sales_order_df}
 
         with pytest.raises(ValueError, match="Missing columns in 'sales_order'"):
-            fact_sales_order_dataframe(broken_df)
+            get_fact_sales_order_df(broken_df)
