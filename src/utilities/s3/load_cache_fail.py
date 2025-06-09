@@ -2,10 +2,10 @@ import os
 
 from get_file_from_s3_bucket import get_file_from_s3_bucket
 
-from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
-    parquet_to_dataframe,
+from src.utilities.parquets.create_data_frame_from_parquet import (
+    create_data_frame_from_parquet,
 )
-from utilities.state.get_current_state import get_current_state
+from src.utilities.state.get_current_state import get_current_state
 
 INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
 INGEST_PREFIX = os.environ.get("")
@@ -29,7 +29,7 @@ def s3_load_cache_fail(client, extracted_dataframes, table_name):
 
         key = state["ingest_state"][f"{table_name}"]["ingest_log"][-1]["key"]
 
-        return parquet_to_dataframe(
+        return create_data_frame_from_parquet(
             get_file_from_s3_bucket(client, INGEST_ZONE_BUCKET_NAME, key)
         )
     except Exception as e:
