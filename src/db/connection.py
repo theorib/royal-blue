@@ -9,15 +9,17 @@ logger.setLevel(logging.INFO)
 
 
 def connect_db(db_source: str) -> Connection[DictRow]:
+    if db_source not in ["TOTESYS", "DATAWAREHOUSE"]:
+        raise ValueError(
+            "db_source invalid, must be either 'TOTESYS' or 'DATAWAREHOUSE'"
+        )
 
-    if db_source not in ["TOTESYS_DB_DATABASE", "DATAWAREHOUSE_DB_DATABASE"]:
-        raise ValueError("db_source invalid, must be either 'TOTESYS_DB_DATABASE' or 'DATAWAREHOUSE_DB_DATABASE'")
-                         
     user = os.getenv("f{db_source}_DB_USER")
     password = os.getenv("f{db_source}_PASSWORD")
     host = os.getenv("f{db_source}_HOST")
     dbname = os.getenv("f{db_source}_DATABASE")
     port = os.getenv("f{db_source}_PORT")
+
     try:
         conn: Connection[DictRow] = connect(
             f"user={user} password={password} host={host} dbname={dbname} port={int(port or 0000)}",
