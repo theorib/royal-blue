@@ -3,7 +3,7 @@ from io import BytesIO
 import pandas as pd
 
 
-def parquet_to_dataframe(parquet_file):
+def create_data_frame_from_parquet(parquet_file):
     """
     Converts a Parquet file in bytes to a Pandas DataFrame.
     """
