@@ -13,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 def filter_out_values(values: List[str], values_to_filter: List[str]):
     """
-    Remove specified values from a list.
+    Remove specified values from a list of strings.
 
     Args:
         values (List[str]): The original list of string values.
@@ -31,7 +31,7 @@ def get_totesys_table_names(
     table_names_to_filter_out: List[str] = ["_prisma_migrations"],
 ) -> List[str]:
     """
-    Retrieve the names of all public tables in the database, excluding specified ones.
+    Retrieve the names of all public tables in the Totasys database, excluding specified ones.
 
     Args:
         conn (Connection[DictRow]): A database connection object.
@@ -71,7 +71,7 @@ def get_totesys_table_names(
 
 def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str):
     """
-    Fetch the most recent 'last_updated' timestamp from a given table.
+    Fetch the most recent 'last_updated' timestamp out of all records of a given table.
 
     Args:
         conn (Connection[DictRow]): A database connection object.
@@ -109,7 +109,7 @@ def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str)
 
 def get_table_data(
     conn: Connection[DictRow], table_name: str, last_updated: datetime | None = None
-):
+) -> List[DictRow]:
     """
     Retrieve all data from a table, optionally filtering by 'last_updated' timestamp.
 
@@ -119,35 +119,23 @@ def get_table_data(
         last_updated (datetime | None, optional): A datetime to filter records updated after. Defaults to None.
 
     Returns:
-        dict: A dictionary with:
-              - 'success': containing the list of row data
-              - 'error': if the query fails
+        List[DictRow]: A list of dictionaries.Each dictionary corresponds to a table row. Each key in a dictionary is the column name and the value is the row value for that column.
     """
-    try:
-        base_query = sql.SQL("SELECT * FROM public.{}").format(
-            sql.Identifier(table_name)
+
+    query = sql.SQL("SELECT * FROM public.{}").format(sql.Identifier(table_name))
+
+    if last_updated:
+        query_with_last_updated = sql.SQL("WHERE last_updated > {}").format(
+            sql.Literal(last_updated)
         )
 
-        if last_updated:
-            query_with_last_updated = sql.SQL("WHERE last_updated > {}").format(
-                sql.Literal(last_updated)
-            )
+        query = query + query_with_last_updated
 
-            query = base_query + query_with_last_updated
+    with conn.cursor() as cursor:
+        cursor.execute(query)
+        result = cursor.fetchall()
 
-        else:
-            query = base_query
-
-        with conn.cursor() as cursor:
-            cursor.execute(query)
-            db_response = cursor.fetchall()
-
-            result = {"success": {"data": db_response}}
-
-        return result
-
-    except Exception as e:
-        return handle_db_exception(e)
+    return result
 
 
 def handle_db_exception(e: Exception) -> dict:
@@ -162,10 +150,25 @@ def handle_db_exception(e: Exception) -> dict:
     """
     error_type = type(e).__name__
     error_message = ERROR_MAP.get(type(e), ERROR_MAP[Exception])
-    logger.error(f"{error_type}: {error_message} | {str(e)}")
+    logger.error(f"{error_type}: {error_message} | {str(e)}", exc_info=e)
 
     return {
         "error": {
             "message": f"{error_type}: {error_message}",
         }
     }
+
+
+def handle_psycopg_exceptions(e: Exception):
+    """
+    Handle database exceptions and return a formatted error message.
+
+    Args:
+        e (Exception): The exception that was raised.
+
+    Returns:
+        dict: A dictionary with an 'error' message describing the exception type and mapped message.
+    """
+    error_type = type(e).__name__
+    error_message = ERROR_MAP.get(type(e), ERROR_MAP[Exception])
+    logger.error(f"{error_type}: {error_message} | {str(e)}", exc_info=e)

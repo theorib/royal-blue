@@ -6,9 +6,14 @@ from pprint import pformat
 
 import boto3
 import orjson
+from psycopg import Error
 
 from src.db.connection import connect_db
-from src.db.db_helpers import get_table_data, get_totesys_table_names
+from src.db.db_helpers import (
+    get_table_data,
+    get_totesys_table_names,
+    handle_psycopg_exceptions,
+)
 from src.utilities.extract_lambda_utils import (
     create_data_frame_from_list,
     create_parquet_metadata,
@@ -90,21 +95,17 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                     "ingest_state"
                 ][table_name]["last_updated"]
 
-                db_response = get_table_data(
+                table_data = get_table_data(
                     conn,
                     table_name,  # type: ignore
                     current_state_last_updated,
                 )
                 extraction_timestamp = datetime.now()
 
-                if db_response.get("error"):
-                    raise Exception(db_response["error"]["message"])
-
-                if not len(db_response["success"]["data"]):
+                if not len(table_data):
                     logger.info(f"No new data to extract from table: {table_name}")
                     continue
 
-                table_data = db_response["success"]["data"]
                 new_table_data_last_updated: datetime = (
                     get_last_updated_from_raw_table_data(table_data)
                 )
@@ -155,11 +156,17 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
         logger.info("End of extraction process for all tables")
         return orjson.dumps(result)
 
+    except Error as err:
+        handle_psycopg_exceptions(err)
+        raise err
+
     except Exception as err:
-        logger.critical(err)
+        logger.critical(err, exc_info=err)
         raise err
 
 
 if __name__ == "__main__":
+    from pprint import pprint
+
     result = lambda_handler({}, {})
-    # pprint(result)
+    pprint(result)
