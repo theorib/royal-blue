@@ -28,24 +28,9 @@ def dim_counterparty_dataframe(dataframes: dict):
         raise ValueError("Error: Missing address table.")
 
     try:
-        counterparty_df = counterparty_df.merge(
-            address_df[
-                [
-                    "legal_address_id",
-                    "address_line_1",
-                    "address_line_2",
-                    "district",
-                    "city",
-                    "postal_code",
-                    "country",
-                    "phone",
-                ]
-            ],
-            on="legal_address_id",
-        )
-
-        counterparty_df = counterparty_df.rename(
+        renamed_address_df = address_df.rename(
             columns={
+                "address_id": "legal_address_id",
                 "address_line_1": "counterparty_legal_address_line_1",
                 "address_line_2": "counterparty_legal_address_line_2",
                 "district": "counterparty_legal_district",
@@ -56,7 +41,12 @@ def dim_counterparty_dataframe(dataframes: dict):
             }
         )
 
-        dim_counterparty = counterparty_df[
+        counterparty_address_merged_df = counterparty_df.merge(
+            renamed_address_df,
+            on="legal_address_id",
+        )
+
+        dim_counterparty_df = counterparty_address_merged_df[
             [
                 "counterparty_id",
                 "counterparty_legal_name",
@@ -70,6 +60,6 @@ def dim_counterparty_dataframe(dataframes: dict):
             ]
         ]
 
-        return dim_counterparty
+        return dim_counterparty_df
     except Exception as e:
         raise e
