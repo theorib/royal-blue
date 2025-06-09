@@ -1,9 +1,9 @@
 import boto3
 
-from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
-from src.utilities.transform_lambda_utils.convert_parquet_to_dataframe import (
-    parquet_to_dataframe,
+from src.utilities.parquets.create_data_frame_from_parquet import (
+    create_data_frame_from_parquet,
 )
+from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
 
 BUCKET_NAME = "ingestion-zone-20250530151335299400000005"
 client = boto3.client("s3")
@@ -52,7 +52,7 @@ def extract_dataframes_from_event(client, event):
                 raise Exception(s3_result["error"]["message"])
 
             parquet_bytes = s3_result["success"]["data"]
-            data_frame = parquet_to_dataframe(parquet_bytes)
+            data_frame = create_data_frame_from_parquet(parquet_bytes)
             extracted_data_frames[table_name] = data_frame
 
         except Exception as e:
