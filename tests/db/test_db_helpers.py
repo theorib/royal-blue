@@ -1,8 +1,7 @@
 import logging
 from copy import copy
 from datetime import datetime
-from pprint import pprint
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from psycopg import Connection, Error, errors
@@ -222,12 +221,3 @@ class TestGetTableData:
         with pytest.raises(Error) as err:
             get_table_data(conn, "currency", "123")  # type: ignore
         assert err.typename == "InvalidDatetimeFormat"
-
-    # @pytest.mark.skip
-    @patch("src.db.db_helpers.get_table_data")
-    @pytest.mark.it("test description")
-    def test_(self, mock_get_table_data):
-        conn = connect_db()
-        get_table_data(conn, "currency")
-        pprint(dir(mock_get_table_data))
-        mock_get_table_data.assert_called_once_with(conn, "currency")
