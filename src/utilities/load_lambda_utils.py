@@ -1,0 +1,50 @@
+import logging
+
+import pandas as pd
+from psycopg import Connection, sql
+from psycopg.rows import DictRow
+
+logger = logging.getLogger(__name__)
+
+def create_db_entries_from_df(conn:Connection[DictRow], table_name, df:pd.DataFrame):
+    with conn.cursor() as cursor:
+        if df.empty:
+            logger.info(f"No entries available for {table_name}.")
+            return
+            # insert_str = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+            # sql.Identifier(tableName),
+            # sql.SQL(",").join(map(sql.Identifier, test)),
+            # sql.SQL(",").join(map(sql.Placeholder, test))
+            # )
+        # query = sql.SQL("SELECT * FROM public.{}").format(sql.Identifier(table_name))
+        columns = df.columns
+        for row in df.to_records():
+            values_to_insert = row.tolist()[1:]
+            query = sql.SQL("""
+                    INSERT INTO {} ({})
+                    VALUES ({});
+                    """).format(
+                        sql.Identifier(table_name), 
+                        sql.SQL(", ").join(columns),
+                        sql.SQL(", ").join(values_to_insert)
+                        )
+            # cursor.excute
+            # cur.execute(query,
+    # (10, datetime.date(2020, 11, 18), "O'Reilly"))
+        # values = df.to_values.tolist()
+        # columns = ', '.join(df.columns)
+
+        # insert_query = f"""
+        # INSERT INTO {table_name} ({columns})
+        # VALUES %s"""
+
+        # try:
+        #     execute_values(cursor, insert_query, values)
+        #     conn.commit() 
+
+        #     logger.info(f"Inserted {len(df)} rows into {table_name}.")
+        # except Exception as e:
+        #     logger.error(f"Failed to insert records into {table_name}: {str(e)}")
+        #     conn.rollback()
+
+    
