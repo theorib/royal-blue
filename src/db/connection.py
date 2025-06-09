@@ -13,7 +13,7 @@ def connect_db(db_source: Literal["TOTESYS", "DATAWAREHOUSE"]) -> Connection[Dic
     """
     Connects to either the TOTESYS or DATAWAREHOUSE database using environment variables.
     Returns a psycopg connection with rows as dictionaries.
-    
+
     Raises a ValueError if the db_source is invalid.
     """
     if db_source not in ["TOTESYS", "DATAWAREHOUSE"]:
@@ -21,11 +21,11 @@ def connect_db(db_source: Literal["TOTESYS", "DATAWAREHOUSE"]) -> Connection[Dic
             "db_source invalid, must be either 'TOTESYS' or 'DATAWAREHOUSE'"
         )
 
-    user = os.getenv("f{db_source}_DB_USER")
-    password = os.getenv("f{db_source}_PASSWORD")
-    host = os.getenv("f{db_source}_HOST")
-    dbname = os.getenv("f{db_source}_DATABASE")
-    port = os.getenv("f{db_source}_PORT")
+    user = os.getenv(f"{db_source}_DB_USER")
+    password = os.getenv(f"{db_source}_DB_PASSWORD")
+    host = os.getenv(f"{db_source}_DB_HOST")
+    dbname = os.getenv(f"{db_source}_DB_DATABASE")
+    port = os.getenv(f"{db_source}_DB_PORT")
 
     try:
         conn: Connection[DictRow] = connect(
