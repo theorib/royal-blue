@@ -71,4 +71,4 @@ def lambda_handler(event: dict, context: EmptyDict):
 
 
 if __name__ == "__main__":
-    result = lambda_handler({}, {})
+    # result = lambda_handler({}, {})
