@@ -14,6 +14,7 @@ from src.utilities.dimensions.dim_counterparty_transform import (
 from src.utilities.dimensions.dim_currency_transform import dim_currency_dataframe
 from src.utilities.dimensions.dim_date_transform import dim_date_dataframe
 from src.utilities.dimensions.dim_design_transform import dim_design_dataframe
+from src.utilities.dimensions.dim_location_transform import dim_location_dataframe
 from src.utilities.dimensions.dim_staff_transform import dim_staff_dataframe
 from src.utilities.extract_lambda_utils import create_parquet_metadata
 from src.utilities.facts.create_fact_sales_order_from_df import (
@@ -141,31 +142,32 @@ def lambda_handler(event, context):
                         counterparty=all_tables_dfs["counterparty"],
                         address=all_tables_dfs["address"],
                     )
-                    prefix = "dim_"
+                    new_table_name = "dim_counterparty"
                 case "design":
                     df = dim_design_dataframe(
                         design=all_tables_dfs["design"],
                     )
-                    prefix = "dim_"
+                    new_table_name = "dim_design"
                 case "currency":
                     df = dim_currency_dataframe(currency=all_tables_dfs["currency"])
-                    prefix = "dim_"
+                    new_table_name = "dim_currency"
                 case "staff":
                     df = dim_staff_dataframe(
                         department=all_tables_dfs["department"],
                         staff=all_tables_dfs["staff"],
                     )
-                    prefix = "dim_"
+                    new_table_name = "dim_staff"
                 case "dim_date":
                     df = dim_date_dataframe("20221102", "20500101")
-                    prefix = ""
+                    new_table_name = "dim_date"
+                case "address":
+                    df = dim_location_dataframe(address=all_tables_dfs["address"])
+                    new_table_name = "dim_location"
                 case "sales_order":
                     df = create_fact_sales_order_from_df(all_tables_dfs["sales_order"])
-                    prefix = "fact_"
+                    new_table_name = "fact_sales_order"
                 case _:
                     continue
-
-            new_table_name = prefix + table_name
 
             parquet = create_parquet_from_data_frame(df)
 
