@@ -3,6 +3,7 @@ import json
 import boto3
 import pytest
 from moto import mock_aws
+from unittest.mock import patch
 
 from src.utilities.state.set_current_state import set_current_state
 
@@ -52,3 +53,13 @@ class TestSetCurrentState:
         data = json.loads(content)
 
         assert data == new_state
+
+    @pytest.mark.it("Raises an exception when add_file_to_s3_bucket returns an error")
+    def test_add_file_returns_error(self, s3_fixture):
+        s3, bucket = s3_fixture
+        mock_state = {"some": "state"}
+
+        with patch("src.utilities.state.set_current_state.add_file_to_s3_bucket") as mock_upload:
+            mock_upload.return_value = {"error": "Upload failed"}
+            with pytest.raises(Exception, match="Failed to upload current state to S3"):
+                set_current_state(mock_state, bucket, s3)
