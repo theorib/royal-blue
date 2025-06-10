@@ -1,6 +1,5 @@
 resource "aws_cloudwatch_log_group" "critical_log_group" {
-  name = "lambda_logs"
-
+  name_prefix = "lambda_logs"
 }
 
 resource "aws_cloudwatch_log_metric_filter" "lambda_critical_errors" {
