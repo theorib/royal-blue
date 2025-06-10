@@ -171,6 +171,7 @@ if __name__ == "__main__":
     conn = connect_db("DATAWAREHOUSE")
 
     with conn:
+        pass
         # print("currency_df", currency_df)
         # pprint(str(datetime.now()))
         # pprint((dim_date_df["date_id"][0]))
