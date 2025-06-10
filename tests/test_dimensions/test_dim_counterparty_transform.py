@@ -71,13 +71,17 @@ class TestDimCounterpartyDataframe:
     @pytest.mark.it("check should raise ValueError when counterparty table is missing")
     def test_missing_counterparty(self):
         data = {"address": pd.DataFrame()}
-        with pytest.raises(ValueError, match="Error: Missing required dataframe 'counterparty'."):
+        with pytest.raises(
+            ValueError, match="Error: Missing required dataframe 'counterparty'."
+        ):
             dim_counterparty_dataframe(**data)
 
     @pytest.mark.it("check should raise ValueError when address table is missing")
     def test_missing_address(self):
         data = {"counterparty": pd.DataFrame()}
-        with pytest.raises(ValueError, match="Error: Missing required dataframe 'address'."):
+        with pytest.raises(
+            ValueError, match="Error: Missing required dataframe 'address'."
+        ):
             dim_counterparty_dataframe(**data)
 
     @pytest.mark.it(

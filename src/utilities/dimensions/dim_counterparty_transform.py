@@ -1,4 +1,4 @@
-def dim_counterparty_dataframe(dataframes: dict):
+def dim_counterparty_dataframe(**dataframes):
     """
     Transforms and returns a dimension dataframe for counterparties by merging with address data.
 
@@ -19,13 +19,14 @@ def dim_counterparty_dataframe(dataframes: dict):
         KeyError: If required columns are missing from the 'address' dataframe.
         Exception: Propagates any other unexpected exception that occurs during processing.
     """
+    required_keys = ["counterparty", "address"]
+
+    for key in required_keys:
+        if key not in dataframes:
+            raise ValueError(f"Error: Missing required dataframe '{key}'.")
+
     counterparty_df = dataframes.get("counterparty")
     address_df = dataframes.get("address")
-
-    if counterparty_df is None:
-        raise ValueError("Error: Missing counterparty table.")
-    if address_df is None:
-        raise ValueError("Error: Missing address table.")
 
     try:
         renamed_address_df = address_df.rename(
