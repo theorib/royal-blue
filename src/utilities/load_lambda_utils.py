@@ -1,6 +1,4 @@
 import logging
-from datetime import datetime
-from pprint import pprint
 
 import pandas as pd
 from psycopg import Connection, sql
