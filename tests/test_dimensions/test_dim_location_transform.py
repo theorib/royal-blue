@@ -6,18 +6,16 @@ from src.utilities.dimensions.dim_location_transform import dim_location_datafra
 
 @pytest.fixture
 def mock_address_df():
-    return pd.DataFrame(
-        {
-            "address_id": ["1", "25"],
-            "address_line_1": ["123 Lane", "456 Avenue"],
-            "address_line_2": ["Suite 4", "Flat 5"],
-            "district": ["Central", "North"],
-            "city": ["London", "Bristol"],
-            "postal_code": ["E1 6AN", "BS1 4TB"],
-            "country": ["UK", "UK"],
-            "phone": ["0123456789", "0123456774"],
-        }
-    )
+    return pd.DataFrame({
+        "address_id": ["1", "25"],
+        "address_line_1": ["123 Lane", "456 Avenue"],
+        "address_line_2": ["Suite 4", "Flat 5"],
+        "district": ["Central", "North"],
+        "city": ["London", "Bristol"],
+        "postal_code": ["E1 6AN", "BS1 4TB"],
+        "country": ["UK", "UK"],
+        "phone": ["0123456789", "0123456774"],
+    })
 
 
 @pytest.mark.describe("dim_location_dataframe Function Behaviour")
@@ -30,7 +28,7 @@ class TestDimLocationDataframe:
         assert isinstance(result, pd.DataFrame)
 
         columns = [
-            "address_id",
+            "location_id",
             "address_line_1",
             "address_line_2",
             "district",
