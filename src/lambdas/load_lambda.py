@@ -7,8 +7,7 @@ import orjson
 import pandas as pd
 
 from src.db.connection import connect_db
-
-# from src.utilities.load_lambda_utils import create_db_entries_from_df
+from src.utilities.load_lambda_utils import create_db_entries_from_df
 from src.utilities.parquets.create_data_frame_from_parquet import (
     create_data_frame_from_parquet,
 )
@@ -72,38 +71,29 @@ def lambda_handler(event: dict, context: EmptyDict):
             )
 
             if file_data["table_name"].startswith("dim"):
-                dims_to_process.append(
-                    {
-                        "table_name": file_data["table_name"],
-                        "data_frame": df,
-                    }
-                )
+                dims_to_process.append({
+                    "table_name": file_data["table_name"],
+                    "data_frame": df,
+                })
             else:
-                facts_to_process.append(
-                    {
-                        "table_name": file_data["table_name"],
-                        "data_frame": df,
-                    }
-                )
-        # print(facts_to_process[0]["data_frame"].columns)
-        print([item["table_name"] for item in dims_to_process])
-        # print(dims_to_process[1]["data_frame"])
-        # print(dims_to_process[0]["data_frame"])
-        # print(dims_to_process)
-        with conn:
-            pass
-        #     for file_data in dims_to_process:
-        #         logger.info(
-        #             f"Processing {len(file_data['data_frame'])} rows into table {file_data['table_name']}."
-        #         )
-        #         create_db_entries_from_df(
-        #             conn, file_data["table_name"], file_data["data_frame"]
-        #         )
+                facts_to_process.append({
+                    "table_name": file_data["table_name"],
+                    "data_frame": df,
+                })
 
-        #     for file_data in facts_to_process:
-        #         create_db_entries_from_df(
-        #             conn, file_data["table_name"], file_data["data_frame"]
-        #         )
+        with conn:
+            for file_data in dims_to_process:
+                logger.info(
+                    f"Processing {len(file_data['data_frame'])} rows into table {file_data['table_name']}."
+                )
+                create_db_entries_from_df(
+                    conn, file_data["table_name"], file_data["data_frame"]
+                )
+
+            for file_data in facts_to_process:
+                create_db_entries_from_df(
+                    conn, file_data["table_name"], file_data["data_frame"]
+                )
 
     except Exception as err:
         logger.critical(err)
@@ -125,44 +115,51 @@ if __name__ == "__main__":
                 "key": "2022/11/3/dim_counterparty_2022-11-3_14-20-51_563000.parquet",
                 "filename": "dim_counterparty_2022-11-3_14-20-51_563000.parquet",
                 "last_updated": "2022-11-03T14:20:51.563000",
-                "transformation_timestamp": "2025-06-10T23:01:18.361725",
+                "transformation_timestamp": "2025-06-10T23:28:03.354725",
+            },
+            {
+                "table_name": "dim_location",
+                "key": "2022/11/3/dim_location_2022-11-3_14-20-49_962000.parquet",
+                "filename": "dim_location_2022-11-3_14-20-49_962000.parquet",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "transformation_timestamp": "2025-06-10T23:28:03.521823",
             },
             {
                 "table_name": "dim_staff",
                 "key": "2022/11/3/dim_staff_2022-11-3_14-20-51_563000.parquet",
                 "filename": "dim_staff_2022-11-3_14-20-51_563000.parquet",
                 "last_updated": "2022-11-03T14:20:51.563000",
-                "transformation_timestamp": "2025-06-10T23:01:18.639555",
+                "transformation_timestamp": "2025-06-10T23:28:03.694398",
             },
             {
                 "table_name": "dim_design",
                 "key": "2025/6/10/dim_design_2025-6-10_17-51-9_671000.parquet",
                 "filename": "dim_design_2025-6-10_17-51-9_671000.parquet",
                 "last_updated": "2025-06-10T17:51:09.671000",
-                "transformation_timestamp": "2025-06-10T23:01:18.925980",
+                "transformation_timestamp": "2025-06-10T23:28:03.874850",
             },
             {
                 "table_name": "fact_sales_order",
                 "key": "2025/6/10/fact_sales_order_2025-6-10_18-1-10_155000.parquet",
                 "filename": "fact_sales_order_2025-6-10_18-1-10_155000.parquet",
                 "last_updated": "2025-06-10T18:01:10.155000",
-                "transformation_timestamp": "2025-06-10T23:01:22.726241",
+                "transformation_timestamp": "2025-06-10T23:28:06.736708",
             },
             {
                 "table_name": "dim_currency",
                 "key": "2022/11/3/dim_currency_2022-11-3_14-20-49_962000.parquet",
                 "filename": "dim_currency_2022-11-3_14-20-49_962000.parquet",
                 "last_updated": "2022-11-03T14:20:49.962000",
-                "transformation_timestamp": "2025-06-10T23:01:23.147184",
+                "transformation_timestamp": "2025-06-10T23:28:06.940325",
             },
             {
                 "table_name": "dim_date",
-                "key": "2025/6/10/dim_date_2025-6-10_23-1-16_240148.parquet",
-                "filename": "dim_date_2025-6-10_23-1-16_240148.parquet",
-                "last_updated": "2025-06-10T23:01:16.240148",
-                "transformation_timestamp": "2025-06-10T23:01:24.739517",
+                "key": "2025/6/10/dim_date_2025-6-10_23-28-1_818204.parquet",
+                "filename": "dim_date_2025-6-10_23-28-1_818204.parquet",
+                "last_updated": "2025-06-10T23:28:01.818204",
+                "transformation_timestamp": "2025-06-10T23:28:08.095612",
             },
         ]
     }
 
-    lambda_handler(test_args, {})
+    # lambda_handler(test_args, {})
