@@ -3,7 +3,6 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pprint
 from typing import List
 
 import boto3
@@ -16,7 +15,9 @@ from src.utilities.dimensions.dim_currency_transform import dim_currency_datafra
 from src.utilities.dimensions.dim_design_transform import dim_design_dataframe
 from src.utilities.dimensions.dim_staff_transform import dim_staff_dataframe
 from src.utilities.extract_lambda_utils import create_parquet_metadata
-from src.utilities.facts.create_fact_sales_order_from_df import get_fact_sales_order_df
+from src.utilities.facts.create_fact_sales_order_from_df import (
+    create_fact_sales_order_from_df,
+)
 from src.utilities.parquets.create_data_frame_from_parquet import (
     create_data_frame_from_parquet,
 )
@@ -25,19 +26,8 @@ from src.utilities.parquets.create_parquet_from_data_frame import (
 )
 from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
 from src.utilities.s3.get_file_from_s3_bucket import get_file_from_s3_bucket
-
-# from src.utilities.extract_lambda_utils import create_parquet_metadata
-# from src.utilities.parquets.create_parquet_from_data_frame import (
-#     create_parquet_from_data_frame,
-# )
-# from src.utilities.s3.add_file_to_s3_bucket import add_file_to_s3_bucket
-# from src.utilities.s3.get_cache_missing_table import cache_missing_table
 from src.utilities.state.get_current_state import get_current_state
 from src.utilities.state.set_current_state import set_current_state
-
-# from src.utilities.transform_lambda_utils.extract_dataframe_from_event import (
-#     extract_dataframes_from_event,
-# )
 
 logging.basicConfig(
     level=logging.INFO,
@@ -57,6 +47,13 @@ logger.setLevel(logging.INFO)
 #         }
 #     ]
 # }
+
+# result = {"files_to_process": [
+#     {
+#         "table_name": 'dim_counterparty',
+#         "key": "2022/11/3/dim_counterparty_2022-11-3_14-20-51_563000.parquet"
+#     }
+# ]}
 
 
 def lambda_handler(event, context):
@@ -108,20 +105,11 @@ def lambda_handler(event, context):
     files_to_process: List[dict] = orjson.loads(json.dumps(event)).get(
         "files_to_process"
     )
-    print("files to process----")
-    pprint(files_to_process)
 
     current_state: dict = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
     final_state = deepcopy(current_state)
 
     result = {"files_to_process": []}
-
-    # result = {"files_to_process": [
-    #     {
-    #         "table_name": 'dim_counterparty',
-    #         "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet"
-    #     }
-    # ]}
 
     if not files_to_process:
         logger.info("Finish Transformation Lambda with no files to process.")
@@ -133,6 +121,7 @@ def lambda_handler(event, context):
             "Running transform process for the first time. Gathering data from all tables"
         )
 
+        # TODO this function needs to move to it's own file
         def get_dataframes_from_files_to_process(client, bucket, files_to_process):
             all_df_to_process = {}
             for file_data in files_to_process:
@@ -155,14 +144,16 @@ def lambda_handler(event, context):
         for file_to_process in files_to_process:
             table_name = file_to_process["table_name"]
             last_updated = file_to_process["last_updated"]
+            # ! DATE needs to be processed first?
             table_name_func_lookup = {
                 "design": dim_design_dataframe,
                 "counterparty": dim_counterparty_dataframe,
                 "currency": dim_currency_dataframe,
                 "staff": dim_staff_dataframe,
-                "sales_order": get_fact_sales_order_df,
+                "sales_order": create_fact_sales_order_from_df,
                 #! "dim_date":???????
             }
+
             prefix = "fact_" if "fact" in table_name_func_lookup[table_name] else "dim_"
             new_table_name = prefix + table_name
 
@@ -192,8 +183,6 @@ def lambda_handler(event, context):
 
             # TODO update_state
 
-        return result
-
     else:
         # now we only process incrementally
         pass
@@ -202,128 +191,123 @@ def lambda_handler(event, context):
     return orjson.dumps(result)
 
 
-"""
-    required_tables = {
-        "design",
-        "counterparty",
-        "address",
-        "currency",
-        "staff",
-        "department",
-        "transaction",
-        "sales_order",
-    }
-
-    logger.info("Starting Transformation Lambda")
-    PROCESS_ZONE_BUCKET_NAME = os.environ.get("PROCESS_ZONE_BUCKET_NAME")
-    # INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
-    # LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
-
-    try:
-        s3_client = boto3.client("s3")
-        # ? Maybe the Cache could be the ingest_state that we always have available
-        cached_dataframes: dict[str, pd.DataFrame] = {}
-
-        # ? Maybe Event tables could have a better name like incoming or to_transform or transform_queue table??
-        # ? Maybe we could change the word extract to get to keep consistency with the rest of the project
-        # ! This function should receive the INGEST_ZONE_BUCKET_NAME bucket as an argument to re-pass it into get_file_from_s3_bucket
-        event_dataframes = extract_dataframes_from_event(s3_client, event)
-        missing_tables = required_tables - set(event_dataframes.keys())
-
-        if missing_tables:
-            logger.info(f"Cache missing tables from s3: {', '.join(missing_tables)}")
-
-        for table in missing_tables:
-            # ! This function should receive the INGEST_ZONE_BUCKET_NAME bucket as an argument to re-pass it into get_file_from_s3_bucket
-            # ? Also this function only gets table data it doesn't handle caching which is handled in the next line. It should be called something like get_table_data_from_s3 maybe?
-            missing_table_dataframe = cache_missing_table(
-                s3_client, event_dataframes, table
-            )
-            cached_dataframes[table] = missing_table_dataframe
-
-        # Combine cached_dataframes with event_dataframes
-        all_dataframes: dict[str, pd.DataFrame] = {
-            **event_dataframes,
-            **cached_dataframes,
-        }
-
-        # Transform dataframes into dimensions -> facts
-        # ? since we are passing all_dataframes to all the helper functions, does this mean that we are allways processing all data all over again?
-        # ? Maybe we are missing a logic to handle incremental steps
-        dim_counterparty = dim_counterparty_dataframe(all_dataframes)
-        dim_location = dim_location_dataframe(all_dataframes)
-        dim_currency = dim_currency_dataframe(all_dataframes)
-        dim_staff = dim_staff_dataframe(all_dataframes)
-        dim_design = dim_design_dataframe(all_dataframes)
-        # ? Do we need to create an enourmous amout of date entries? all we need is entries for the date in our database...
-        dim_date = dim_date_dataframe(start_date="20100101", end_date="20351231")
-        # fact_df = fact_df()
-
-        dim_dfs = [
-            dim_counterparty,
-            dim_location,
-            dim_currency,
-            dim_staff,
-            dim_design,
-            dim_date,
-        ]
-        files = []
-
-        # convert to parquets and save into s3
-        for df in dim_dfs:
-            parquet = create_parquet_from_data_frame(df)
-
-            # ! is now the right timestamp to pass to the file? genuine question... I don't know
-            _, key = create_parquet_metadata(datetime.now(), df.keys())
-            add_file_to_s3_bucket(s3_client, PROCESS_ZONE_BUCKET_NAME, key, parquet)
-            files.append({df: parquet, "key": key})
-
-        logger.info("Transform Complete")
-        return files
-
-    except Exception as err:
-        logger.critical(f"ERROR: {err}")
-        raise err
-    this may  be what logs look like for transform?
-    {
-       "table_name": "fact_sales_order",
-       "file_name": fact_sales_order_2025-6-6_17-14-9_783000.parquet
-       "last_updated": "2025-05-27 15:24:07.582020"
-       "key": "2025/6/6/fact_sales_order_2025-6-6_17-14-9_783000.parquet"
-       "source_files": [
-          {
-                   "table_name": "sales_order",
-                   "extraction_timestamp": "2025-06-06T17:24:03.378788",
-                   "last_updated": "2025-06-06T17:14:09.783000",
-                   "file_name": "sales_order_2025-6-6_17-14-9_783000.parquet",
-                   "key": "2025/6/6/sales_order_2025-6-6_17-14-9_783000.parquet"
-           },
-           {
-                   "table_name": "address",
-                   "extraction_timestamp": "2025-06-06T10:17:48.861703",
-                   "last_updated": "2022-11-03T14:20:49.962000",
-                   "file_name": "address_2022-11-3_14-20-49_962000.parquet",
-                   "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet"
-           }
-       ]
-    
-    }
-"""
-
-
 if __name__ == "__main__":
-    print("python Dictionary ---------")
-    original_return_value = [
-        {
-            "table_name": "currency",
-            "extraction_timestamp": datetime.now(),
-            "last_updated": datetime.now(),
-            "file_name": "filename",
-            "key": "key",
-        }
-    ]
-    pprint(original_return_value)
-    print("event ---------")
-    event = orjson.dumps(original_return_value)
+    # print("python Dictionary ---------")
+    # original_return_value = [
+    #     {
+    #         "table_name": "currency",
+    #         "extraction_timestamp": datetime.now(),
+    #         "last_updated": datetime.now(),
+    #         "file_name": "filename",
+    #         "key": "key",
+    #     }
+    # ]
+    # pprint(original_return_value)
+    # print("event ---------")
+    # event = orjson.dumps(original_return_value)
 
-    result = lambda_handler(json.loads(event), {})
+    test_event = {
+        "files_to_process": [
+            [
+                {
+                    "table_name": "counterparty",
+                    "extraction_timestamp": "2025-06-10T13:26:22.358310",
+                    "last_updated": "2022-11-03T14:20:51.563000",
+                    "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
+                    "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "address",
+                    "extraction_timestamp": "2025-06-10T13:26:26.138237",
+                    "last_updated": "2022-11-03T14:20:49.962000",
+                    "file_name": "address_2022-11-3_14-20-49_962000.parquet",
+                    "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "department",
+                    "extraction_timestamp": "2025-06-10T13:26:26.423047",
+                    "last_updated": "2022-11-03T14:20:49.962000",
+                    "file_name": "department_2022-11-3_14-20-49_962000.parquet",
+                    "key": "2022/11/3/department_2022-11-3_14-20-49_962000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "purchase_order",
+                    "extraction_timestamp": "2025-06-10T13:26:27.039068",
+                    "last_updated": "2025-06-10T13:08:09.936000",
+                    "file_name": "purchase_order_2025-6-10_13-8-9_936000.parquet",
+                    "key": "2025/6/10/purchase_order_2025-6-10_13-8-9_936000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "staff",
+                    "extraction_timestamp": "2025-06-10T13:26:28.498981",
+                    "last_updated": "2022-11-03T14:20:51.563000",
+                    "file_name": "staff_2022-11-3_14-20-51_563000.parquet",
+                    "key": "2022/11/3/staff_2022-11-3_14-20-51_563000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "payment_type",
+                    "extraction_timestamp": "2025-06-10T13:26:28.678109",
+                    "last_updated": "2022-11-03T14:20:49.962000",
+                    "file_name": "payment_type_2022-11-3_14-20-49_962000.parquet",
+                    "key": "2022/11/3/payment_type_2022-11-3_14-20-49_962000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "payment",
+                    "extraction_timestamp": "2025-06-10T13:26:30.000828",
+                    "last_updated": "2025-06-10T13:16:09.841000",
+                    "file_name": "payment_2025-6-10_13-16-9_841000.parquet",
+                    "key": "2025/6/10/payment_2025-6-10_13-16-9_841000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "transaction",
+                    "extraction_timestamp": "2025-06-10T13:26:41.218221",
+                    "last_updated": "2025-06-10T13:16:09.841000",
+                    "file_name": "transaction_2025-6-10_13-16-9_841000.parquet",
+                    "key": "2025/6/10/transaction_2025-6-10_13-16-9_841000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "design",
+                    "extraction_timestamp": "2025-06-10T13:26:50.098625",
+                    "last_updated": "2025-06-10T11:28:09.654000",
+                    "file_name": "design_2025-6-10_11-28-9_654000.parquet",
+                    "key": "2025/6/10/design_2025-6-10_11-28-9_654000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "sales_order",
+                    "extraction_timestamp": "2025-06-10T13:26:55.201974",
+                    "last_updated": "2025-06-10T13:16:09.841000",
+                    "file_name": "sales_order_2025-6-10_13-16-9_841000.parquet",
+                    "key": "2025/6/10/sales_order_2025-6-10_13-16-9_841000.parquet",
+                }
+            ],
+            [
+                {
+                    "table_name": "currency",
+                    "extraction_timestamp": "2025-06-10T13:27:02.481800",
+                    "last_updated": "2022-11-03T14:20:49.962000",
+                    "file_name": "currency_2022-11-3_14-20-49_962000.parquet",
+                    "key": "2022/11/3/currency_2022-11-3_14-20-49_962000.parquet",
+                }
+            ],
+        ]
+    }
+
+    result = lambda_handler(test_event, {})
