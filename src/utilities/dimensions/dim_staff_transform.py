@@ -1,6 +1,3 @@
-import pandas as pd
-
-
 def dim_staff_dataframe(**dataframes):
     """
     Constructs the staff dimension table by merging staff data with department names.
