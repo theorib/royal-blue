@@ -3,6 +3,8 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
+
+# from pprint import pprint
 from typing import List
 
 import boto3
@@ -12,6 +14,7 @@ from src.utilities.dimensions.dim_counterparty_transform import (
     dim_counterparty_dataframe,
 )
 from src.utilities.dimensions.dim_currency_transform import dim_currency_dataframe
+from src.utilities.dimensions.dim_date_transform import dim_date_dataframe
 from src.utilities.dimensions.dim_design_transform import dim_design_dataframe
 from src.utilities.dimensions.dim_staff_transform import dim_staff_dataframe
 from src.utilities.extract_lambda_utils import create_parquet_metadata
@@ -57,56 +60,20 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
-    """Pseudo Code suggestion:
-
-        #? what date do we want to use to update state is transform time or is
-        new_last_updated = somefunction()
-
-        #? We probably need a function to add a record to dim_date from a datetime object
-
-        all_dims: dict = get_dimensions_from_table_dfs(all_tables_dfs)
-        all_facts: dict = get_facts_from_table_dfs(all_tables_dfs)
-
-        facts_and_dims = {[**all_dims,**all_facts}
-
-        #? Maybe we need to process dimensions first here?
-        for fact_dim_name, df in facts_and_dims.items():
-            logger.info(f"Creating parquet file for {fact_dim_name}")
-            parquet = create_parquet_from_data_frame(df)
-
-            # ! is now the right timestamp to pass to the file? genuine question... I don't know
-            filename, key = create_parquet_metadata(datetime.now(), df.keys())
-            add_file_to_s3_bucket(s3_client, PROCESS_ZONE_BUCKET_NAME, key, parquet)
-
-            state_entry = create_transform_state_log_entry(filename, key, fact_dim_name, some_timestamp?)
-
-            result.append(state_entry)
-            final_state[fact_dim_name]['transform_log'].append(state_entry)
-
-        final_state['transform_state']['last_updated'] = new_last_updated
-
-
-    # if it's not the first time the function runs, process data incrementally
-    else:
-        # !!!! parquets/df that only have new records are sent to warehouse
-        # kind of rinse and repeat some of the previous if statement
-
-    set_current_state(s3_client,LAMBDA_STATE_BUCKET_NAME,final_state)
-
-    return result
-    """
     PROCESS_ZONE_BUCKET_NAME = os.environ.get("PROCESS_ZONE_BUCKET_NAME")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
     LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
 
     s3_client = boto3.client("s3")
     logger.info("Starting Transformation Lambda")
-    # ! fix event nested lists
+
+    # ! fix datetime not coming in
     files_to_process: List[dict] = orjson.loads(json.dumps(event)).get(
         "files_to_process"
     )
 
     current_state: dict = get_current_state(s3_client, LAMBDA_STATE_BUCKET_NAME)
+
     final_state = deepcopy(current_state)
 
     result = {"files_to_process": []}
@@ -116,7 +83,6 @@ def lambda_handler(event, context):
         return result
 
     if not current_state.get("transform_state", {}).get("last_updated", None):
-        # now we need to process everything
         logger.info(
             "Running transform process for the first time. Gathering data from all tables"
         )
@@ -128,7 +94,10 @@ def lambda_handler(event, context):
                 table_name = file_data["table_name"]
                 key = file_data["key"]
 
-                parquet = get_file_from_s3_bucket(client, bucket, key)
+                response = get_file_from_s3_bucket(client, bucket, key)
+
+                parquet = response["success"]["data"]
+
                 df = create_data_frame_from_parquet(parquet)
 
                 all_df_to_process[table_name] = df
@@ -140,28 +109,70 @@ def lambda_handler(event, context):
         )
 
         # TODO create the dim_dates before anything else
+        # !inject dim_date into files to process
+        inject_dim_date = {
+            "extraction_timestamp": None,
+            "file_name": None,
+            "key": None,
+            "last_updated": datetime.now().isoformat(),
+            "table_name": "dim_date",
+        }
+
+        files_to_process.append(inject_dim_date)
+
+        # !initialize state
+        final_state["transform_state"] = {"last_updated": None, "tables": {}}
+        if final_state:
+            for file_to_process in files_to_process:
+                table_name: str = file_to_process["table_name"]
+                final_state["transform_state"]["tables"][table_name] = {}
 
         for file_to_process in files_to_process:
             table_name = file_to_process["table_name"]
             last_updated = file_to_process["last_updated"]
-            # ! DATE needs to be processed first?
-            table_name_func_lookup = {
-                "design": dim_design_dataframe,
-                "counterparty": dim_counterparty_dataframe,
-                "currency": dim_currency_dataframe,
-                "staff": dim_staff_dataframe,
-                "sales_order": create_fact_sales_order_from_df,
-                #! "dim_date":???????
-            }
 
-            prefix = "fact_" if "fact" in table_name_func_lookup[table_name] else "dim_"
+            # ! these are the tables we are still missing fro post mvp
+            # purchase_order
+            # payment_type
+            # payment
+            # transaction
+
+            match table_name:
+                case "counterparty":
+                    df = dim_counterparty_dataframe(
+                        counterparty=all_tables_dfs["counterparty"],
+                        address=all_tables_dfs["address"],
+                    )
+                    prefix = "dim_"
+                case "design":
+                    df = dim_design_dataframe(
+                        design=all_tables_dfs["design"],
+                    )
+                    prefix = "dim_"
+                case "currency":
+                    df = dim_currency_dataframe(all_tables_dfs)
+                    prefix = "dim_"
+                case "staff":
+                    df = dim_staff_dataframe(all_tables_dfs)
+                    prefix = "dim_"
+                case "dim_date":
+                    df = dim_date_dataframe("20221102", "20500101")
+                    prefix = ""
+                case "sales_order":
+                    df = create_fact_sales_order_from_df(all_tables_dfs["sales_order"])
+                    prefix = "fact_"
+                case _:
+                    continue
+
             new_table_name = prefix + table_name
 
-            df = table_name_func_lookup[table_name](all_tables_dfs)
             parquet = create_parquet_from_data_frame(df)
 
-            # ! if we are processing a fact, we need to send to bucket both dim_date and fact_sales_order
-            filename, key = create_parquet_metadata(last_updated, new_table_name)
+            filename, key = create_parquet_metadata(
+                # ! we need to fix the json import from event to give us datetime objects
+                datetime.fromisoformat(last_updated),
+                new_table_name,
+            )
 
             response = add_file_to_s3_bucket(
                 s3_client, PROCESS_ZONE_BUCKET_NAME, key, parquet
@@ -170,144 +181,121 @@ def lambda_handler(event, context):
             if response.get("error"):
                 raise Exception("something went wring with uploading")
 
+            transformation_timestamp = datetime.now()
+
             log_item = {
                 "table_name": new_table_name,
                 "key": key,
                 "filename": filename,
-                "last_updated": last_updated,
-                "transformation_timestamp": datetime.now(),
-                "transformation_input": file_to_process,
+                # ! we need to fix the json import from event to give us datetime objects
+                "last_updated": datetime.fromisoformat(last_updated),
+                "transformation_timestamp": transformation_timestamp,
+                # TODO take into account that some functions use more than one input
+                # "transformation_input": file_to_process,
             }
 
             result["files_to_process"].append(log_item)
 
-            # TODO update_state
+            final_state["transform_state"]["tables"][table_name][
+                "transformation_timestamp"
+            ] = transformation_timestamp
+            final_state["transform_state"]["tables"][table_name]["process_log"] = [
+                log_item
+            ]
+
+            final_state["transform_state"]["last_updated"] = transformation_timestamp
 
     else:
         # now we only process incrementally
         pass
 
-    set_current_state(final_state, s3_client, LAMBDA_STATE_BUCKET_NAME)
+    set_current_state(final_state, LAMBDA_STATE_BUCKET_NAME, s3_client)
+
     return orjson.dumps(result)
 
 
 if __name__ == "__main__":
-    # print("python Dictionary ---------")
-    # original_return_value = [
-    #     {
-    #         "table_name": "currency",
-    #         "extraction_timestamp": datetime.now(),
-    #         "last_updated": datetime.now(),
-    #         "file_name": "filename",
-    #         "key": "key",
-    #     }
-    # ]
-    # pprint(original_return_value)
-    # print("event ---------")
-    # event = orjson.dumps(original_return_value)
-
     test_event = {
         "files_to_process": [
-            [
-                {
-                    "table_name": "counterparty",
-                    "extraction_timestamp": "2025-06-10T13:26:22.358310",
-                    "last_updated": "2022-11-03T14:20:51.563000",
-                    "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
-                    "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "address",
-                    "extraction_timestamp": "2025-06-10T13:26:26.138237",
-                    "last_updated": "2022-11-03T14:20:49.962000",
-                    "file_name": "address_2022-11-3_14-20-49_962000.parquet",
-                    "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "department",
-                    "extraction_timestamp": "2025-06-10T13:26:26.423047",
-                    "last_updated": "2022-11-03T14:20:49.962000",
-                    "file_name": "department_2022-11-3_14-20-49_962000.parquet",
-                    "key": "2022/11/3/department_2022-11-3_14-20-49_962000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "purchase_order",
-                    "extraction_timestamp": "2025-06-10T13:26:27.039068",
-                    "last_updated": "2025-06-10T13:08:09.936000",
-                    "file_name": "purchase_order_2025-6-10_13-8-9_936000.parquet",
-                    "key": "2025/6/10/purchase_order_2025-6-10_13-8-9_936000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "staff",
-                    "extraction_timestamp": "2025-06-10T13:26:28.498981",
-                    "last_updated": "2022-11-03T14:20:51.563000",
-                    "file_name": "staff_2022-11-3_14-20-51_563000.parquet",
-                    "key": "2022/11/3/staff_2022-11-3_14-20-51_563000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "payment_type",
-                    "extraction_timestamp": "2025-06-10T13:26:28.678109",
-                    "last_updated": "2022-11-03T14:20:49.962000",
-                    "file_name": "payment_type_2022-11-3_14-20-49_962000.parquet",
-                    "key": "2022/11/3/payment_type_2022-11-3_14-20-49_962000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "payment",
-                    "extraction_timestamp": "2025-06-10T13:26:30.000828",
-                    "last_updated": "2025-06-10T13:16:09.841000",
-                    "file_name": "payment_2025-6-10_13-16-9_841000.parquet",
-                    "key": "2025/6/10/payment_2025-6-10_13-16-9_841000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "transaction",
-                    "extraction_timestamp": "2025-06-10T13:26:41.218221",
-                    "last_updated": "2025-06-10T13:16:09.841000",
-                    "file_name": "transaction_2025-6-10_13-16-9_841000.parquet",
-                    "key": "2025/6/10/transaction_2025-6-10_13-16-9_841000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "design",
-                    "extraction_timestamp": "2025-06-10T13:26:50.098625",
-                    "last_updated": "2025-06-10T11:28:09.654000",
-                    "file_name": "design_2025-6-10_11-28-9_654000.parquet",
-                    "key": "2025/6/10/design_2025-6-10_11-28-9_654000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "sales_order",
-                    "extraction_timestamp": "2025-06-10T13:26:55.201974",
-                    "last_updated": "2025-06-10T13:16:09.841000",
-                    "file_name": "sales_order_2025-6-10_13-16-9_841000.parquet",
-                    "key": "2025/6/10/sales_order_2025-6-10_13-16-9_841000.parquet",
-                }
-            ],
-            [
-                {
-                    "table_name": "currency",
-                    "extraction_timestamp": "2025-06-10T13:27:02.481800",
-                    "last_updated": "2022-11-03T14:20:49.962000",
-                    "file_name": "currency_2022-11-3_14-20-49_962000.parquet",
-                    "key": "2022/11/3/currency_2022-11-3_14-20-49_962000.parquet",
-                }
-            ],
+            {
+                "table_name": "counterparty",
+                "extraction_timestamp": "2025-06-10T14:08:43.350529",
+                "last_updated": "2022-11-03T14:20:51.563000",
+                "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
+                "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
+            },
+            {
+                "table_name": "address",
+                "extraction_timestamp": "2025-06-10T14:08:47.273301",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "file_name": "address_2022-11-3_14-20-49_962000.parquet",
+                "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
+            },
+            {
+                "table_name": "department",
+                "extraction_timestamp": "2025-06-10T14:08:47.550481",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "file_name": "department_2022-11-3_14-20-49_962000.parquet",
+                "key": "2022/11/3/department_2022-11-3_14-20-49_962000.parquet",
+            },
+            {
+                "table_name": "purchase_order",
+                "extraction_timestamp": "2025-06-10T14:08:48.153632",
+                "last_updated": "2025-06-10T13:08:09.936000",
+                "file_name": "purchase_order_2025-6-10_13-8-9_936000.parquet",
+                "key": "2025/6/10/purchase_order_2025-6-10_13-8-9_936000.parquet",
+            },
+            {
+                "table_name": "staff",
+                "extraction_timestamp": "2025-06-10T14:08:49.711861",
+                "last_updated": "2022-11-03T14:20:51.563000",
+                "file_name": "staff_2022-11-3_14-20-51_563000.parquet",
+                "key": "2022/11/3/staff_2022-11-3_14-20-51_563000.parquet",
+            },
+            {
+                "table_name": "payment_type",
+                "extraction_timestamp": "2025-06-10T14:08:49.910518",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "file_name": "payment_type_2022-11-3_14-20-49_962000.parquet",
+                "key": "2022/11/3/payment_type_2022-11-3_14-20-49_962000.parquet",
+            },
+            {
+                "table_name": "payment",
+                "extraction_timestamp": "2025-06-10T14:08:51.330283",
+                "last_updated": "2025-06-10T14:08:10.163000",
+                "file_name": "payment_2025-6-10_14-8-10_163000.parquet",
+                "key": "2025/6/10/payment_2025-6-10_14-8-10_163000.parquet",
+            },
+            {
+                "table_name": "transaction",
+                "extraction_timestamp": "2025-06-10T14:08:57.510390",
+                "last_updated": "2025-06-10T14:08:10.163000",
+                "file_name": "transaction_2025-6-10_14-8-10_163000.parquet",
+                "key": "2025/6/10/transaction_2025-6-10_14-8-10_163000.parquet",
+            },
+            {
+                "table_name": "design",
+                "extraction_timestamp": "2025-06-10T14:09:04.570502",
+                "last_updated": "2025-06-10T11:28:09.654000",
+                "file_name": "design_2025-6-10_11-28-9_654000.parquet",
+                "key": "2025/6/10/design_2025-6-10_11-28-9_654000.parquet",
+            },
+            {
+                "table_name": "sales_order",
+                "extraction_timestamp": "2025-06-10T14:09:09.534016",
+                "last_updated": "2025-06-10T14:08:10.163000",
+                "file_name": "sales_order_2025-6-10_14-8-10_163000.parquet",
+                "key": "2025/6/10/sales_order_2025-6-10_14-8-10_163000.parquet",
+            },
+            {
+                "table_name": "currency",
+                "extraction_timestamp": "2025-06-10T14:09:16.490573",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "file_name": "currency_2022-11-3_14-20-49_962000.parquet",
+                "key": "2022/11/3/currency_2022-11-3_14-20-49_962000.parquet",
+            },
         ]
     }
 
-    result = lambda_handler(test_event, {})
+    # result = lambda_handler(test_event, {})
+    # # pprint(orjson.loads(result))
