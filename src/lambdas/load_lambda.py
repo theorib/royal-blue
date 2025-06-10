@@ -2,15 +2,9 @@ import json
 import logging
 import os
 
-# import os
-# from copy import deepcopy
-# from datetime import datetime
-from pprint import pformat
-
 import boto3
-
-# import boto3
 import orjson
+import pandas as pd
 
 from src.db.connection import connect_db
 from src.utilities.load_lambda_utils import create_db_entries_from_df
@@ -27,13 +21,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# event = {"files_to_process": [
-#     {
-#         "table_name": 'dim_counterparty',
-#         "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet"
-#     }
-# ]}
-
 
 def lambda_handler(event: dict, context: EmptyDict):
     s3_client = boto3.client("s3")
@@ -42,7 +29,7 @@ def lambda_handler(event: dict, context: EmptyDict):
     conn = connect_db("DATAWAREHOUSE")
 
     files_to_process = orjson.loads(json.dumps(event)).get("files_to_process")
-    logger.info("Starting transform process for files")
+    logger.info("Start Loading files into Data Warehouse")
 
     """
 
@@ -79,40 +66,100 @@ def lambda_handler(event: dict, context: EmptyDict):
             response = get_file_from_s3_bucket(
                 s3_client, bucket_name=PROCESS_ZONE_BUCKET_NAME, key=file_data["key"]
             )
-            df = create_data_frame_from_parquet(response["success"]["data"])
+            df: pd.DataFrame = create_data_frame_from_parquet(
+                response["success"]["data"]
+            )
 
             if file_data["table_name"].startswith("dim"):
                 dims_to_process.append(
                     {
                         "table_name": file_data["table_name"],
-                        "dataframe": df,
+                        "data_frame": df,
                     }
                 )
             else:
                 facts_to_process.append(
                     {
                         "table_name": file_data["table_name"],
-                        "dataframe": df,
+                        "data_frame": df,
                     }
                 )
+        # print(facts_to_process[0]["data_frame"].columns)
+        # print([item["table_name"] for item in facts_to_process])
+        # print(dims_to_process[1]["data_frame"])
+        # print(dims_to_process[0]["data_frame"])
         with conn:
             for file_data in dims_to_process:
+                logger.info(
+                    f"Processing {len(file_data['data_frame'])} rows into table {file_data['table_name']}."
+                )
                 create_db_entries_from_df(
-                    conn, file_data["table_name"], file_data["df"]
+                    conn, file_data["table_name"], file_data["data_frame"]
                 )
 
             for file_data in facts_to_process:
                 create_db_entries_from_df(
-                    conn, file_data["table_name"], file_data["df"]
+                    conn, file_data["table_name"], file_data["data_frame"]
                 )
 
     except Exception as err:
         logger.critical(err)
         raise err
 
-    logger.info("Result of loading process:\n%s", pformat(result))
-    return orjson.dumps(result)
+    logger.info("Finish loading files into Data Warehouse")
+    # logger.info("Result of loading process:\n%s", pformat(result))
+    return
 
+
+# 2025-06-10 23:45:24,580 | ERROR: Failed to insert records into fact_sales_order: insert or update on table "fact_sales_order" violates foreign key constraint "fact_sales_order_agreed_delivery_location_id_fkey"
+# DETAIL:  Key (agreed_delivery_location_id)=(8) is not present in table "dim_location".
 
 if __name__ == "__main__":
-    result = lambda_handler({}, {})
+    test_args = {
+        "files_to_process": [
+            {
+                "table_name": "dim_counterparty",
+                "key": "2022/11/3/dim_counterparty_2022-11-3_14-20-51_563000.parquet",
+                "filename": "dim_counterparty_2022-11-3_14-20-51_563000.parquet",
+                "last_updated": "2022-11-03T14:20:51.563000",
+                "transformation_timestamp": "2025-06-10T22:38:51.797055",
+            },
+            {
+                "table_name": "dim_staff",
+                "key": "2022/11/3/dim_staff_2022-11-3_14-20-51_563000.parquet",
+                "filename": "dim_staff_2022-11-3_14-20-51_563000.parquet",
+                "last_updated": "2022-11-03T14:20:51.563000",
+                "transformation_timestamp": "2025-06-10T22:38:52.050153",
+            },
+            {
+                "table_name": "dim_design",
+                "key": "2025/6/10/dim_design_2025-6-10_17-51-9_671000.parquet",
+                "filename": "dim_design_2025-6-10_17-51-9_671000.parquet",
+                "last_updated": "2025-06-10T17:51:09.671000",
+                "transformation_timestamp": "2025-06-10T22:38:52.347192",
+            },
+            {
+                "table_name": "fact_sales_order",
+                "key": "2025/6/10/fact_sales_order_2025-6-10_18-1-10_155000.parquet",
+                "filename": "fact_sales_order_2025-6-10_18-1-10_155000.parquet",
+                "last_updated": "2025-06-10T18:01:10.155000",
+                "transformation_timestamp": "2025-06-10T22:38:56.110600",
+            },
+            {
+                "table_name": "dim_currency",
+                "key": "2022/11/3/dim_currency_2022-11-3_14-20-49_962000.parquet",
+                "filename": "dim_currency_2022-11-3_14-20-49_962000.parquet",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "transformation_timestamp": "2025-06-10T22:38:56.924777",
+            },
+            {
+                "table_name": "dim_date",
+                "key": "2025/6/10/dim_date_2025-6-10_22-38-49_770859.parquet",
+                "filename": "dim_date_2025-6-10_22-38-49_770859.parquet",
+                "last_updated": "2025-06-10T22:38:49.770859",
+                "transformation_timestamp": "2025-06-10T22:38:58.400183",
+            },
+        ]
+    }
+
+    lambda_handler(test_args, {})

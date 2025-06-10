@@ -3,7 +3,6 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pprint
 from typing import List
 
 import boto3
@@ -299,5 +298,5 @@ if __name__ == "__main__":
         ]
     }
 
-    result = lambda_handler(test_event, {})
-    pprint(result)
+    # result = lambda_handler(test_event, {})
+    # pprint(result)

@@ -30,7 +30,7 @@ class TestDimLocationDataframe:
         assert isinstance(result, pd.DataFrame)
 
         columns = [
-            "address_id",
+            "location_id",
             "address_line_1",
             "address_line_2",
             "district",
