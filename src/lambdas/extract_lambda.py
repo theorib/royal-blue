@@ -73,7 +73,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
     """
 
-    conn = connect_db()
+    conn = connect_db("TOTESYS")
     s3_client = boto3.client("s3")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
     LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
