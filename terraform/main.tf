@@ -111,3 +111,16 @@ module "load_lambda" {
   DATAWAREHOUSE_DB_DATABASE = var.DATAWAREHOUSE_DB_DATABASE
   DATAWAREHOUSE_DB_PORT     = var.DATAWAREHOUSE_DB_PORT
 }
+
+module "extract_lambda_alert" {
+  source      = "./modules/lambda_alert"
+  lambda_name = "extract_lambda"
+}
+module "transform_lambda_alert" {
+  source      = "./modules/lambda_alert"
+  lambda_name = "transform_lambda"
+}
+module "load_lambda_alert" {
+  source      = "./modules/lambda_alert"
+  lambda_name = "load_lambda"
+}
