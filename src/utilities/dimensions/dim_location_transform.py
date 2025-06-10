@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def dim_location_dataframe(dataframes: dict) -> pd.DataFrame:
+def dim_location_dataframe(**dataframes) -> pd.DataFrame:
     """
     Create the location dimension DataFrame from the extracted raw address data.
 
@@ -24,11 +24,12 @@ def dim_location_dataframe(dataframes: dict) -> pd.DataFrame:
         If the 'address' table is missing or any error occurs during transformation.
     """
 
+    required_keys = ['address']
+    for key in required_keys:
+        if key not in dataframes:
+            raise ValueError(f"Error: Missing required dataframe '{key}'.")
+
     address_df = dataframes.get("address")
-
-    if address_df is None:
-        raise ValueError("Error: Missing address table.")
-
     try:
         dim_location = address_df[
             [
