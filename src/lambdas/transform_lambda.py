@@ -3,7 +3,6 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-from pprint import pprint
 from typing import List
 
 import boto3
