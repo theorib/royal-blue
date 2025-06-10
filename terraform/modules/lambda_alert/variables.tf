@@ -15,11 +15,6 @@ variable "metric_namespace" {
   default     = "Lambda/Custom"
 }
 
-# variable "sns_topic_arn" {
-#   description = "ARN of the SNS topic for alarm notifications"
-#   type        = string
-# }
-
 variable "alert_emails" {
   description = "List of email addresses to receive SNS notifications"
   type        = list(string)
