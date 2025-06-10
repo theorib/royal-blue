@@ -43,7 +43,7 @@ def dim_location_dataframe(**dataframes) -> pd.DataFrame:
                 "phone",
             ]
         ].drop_duplicates()
-
+        dim_location.rename(columns={"address_id": "location_id"}, inplace=True)
         return dim_location
 
     except Exception as e:
