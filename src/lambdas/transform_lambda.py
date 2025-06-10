@@ -299,5 +299,5 @@ if __name__ == "__main__":
         ]
     }
 
-    result = lambda_handler(test_event, {})
-    pprint(result)
+    # result = lambda_handler(test_event, {})
+    # pprint(result)
