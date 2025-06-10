@@ -3,8 +3,7 @@ import logging
 import os
 from copy import deepcopy
 from datetime import datetime
-
-# from pprint import pprint
+from pprint import pprint
 from typing import List
 
 import boto3
@@ -150,10 +149,13 @@ def lambda_handler(event, context):
                     )
                     prefix = "dim_"
                 case "currency":
-                    df = dim_currency_dataframe(all_tables_dfs)
+                    df = dim_currency_dataframe(currency=all_tables_dfs["currency"])
                     prefix = "dim_"
                 case "staff":
-                    df = dim_staff_dataframe(all_tables_dfs)
+                    df = dim_staff_dataframe(
+                        department=all_tables_dfs["department"],
+                        staff=all_tables_dfs["staff"],
+                    )
                     prefix = "dim_"
                 case "dim_date":
                     df = dim_date_dataframe("20221102", "20500101")
@@ -219,77 +221,77 @@ if __name__ == "__main__":
         "files_to_process": [
             {
                 "table_name": "counterparty",
-                "extraction_timestamp": "2025-06-10T14:08:43.350529",
+                "extraction_timestamp": "2025-06-10T20:51:34.260407",
                 "last_updated": "2022-11-03T14:20:51.563000",
                 "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
                 "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
             },
             {
                 "table_name": "address",
-                "extraction_timestamp": "2025-06-10T14:08:47.273301",
+                "extraction_timestamp": "2025-06-10T20:51:37.179714",
                 "last_updated": "2022-11-03T14:20:49.962000",
                 "file_name": "address_2022-11-3_14-20-49_962000.parquet",
                 "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
             },
             {
                 "table_name": "department",
-                "extraction_timestamp": "2025-06-10T14:08:47.550481",
+                "extraction_timestamp": "2025-06-10T20:51:39.879502",
                 "last_updated": "2022-11-03T14:20:49.962000",
                 "file_name": "department_2022-11-3_14-20-49_962000.parquet",
                 "key": "2022/11/3/department_2022-11-3_14-20-49_962000.parquet",
             },
             {
                 "table_name": "purchase_order",
-                "extraction_timestamp": "2025-06-10T14:08:48.153632",
-                "last_updated": "2025-06-10T13:08:09.936000",
-                "file_name": "purchase_order_2025-6-10_13-8-9_936000.parquet",
-                "key": "2025/6/10/purchase_order_2025-6-10_13-8-9_936000.parquet",
+                "extraction_timestamp": "2025-06-10T20:51:42.599581",
+                "last_updated": "2025-06-10T16:51:09.789000",
+                "file_name": "purchase_order_2025-6-10_16-51-9_789000.parquet",
+                "key": "2025/6/10/purchase_order_2025-6-10_16-51-9_789000.parquet",
             },
             {
                 "table_name": "staff",
-                "extraction_timestamp": "2025-06-10T14:08:49.711861",
+                "extraction_timestamp": "2025-06-10T20:51:46.181541",
                 "last_updated": "2022-11-03T14:20:51.563000",
                 "file_name": "staff_2022-11-3_14-20-51_563000.parquet",
                 "key": "2022/11/3/staff_2022-11-3_14-20-51_563000.parquet",
             },
             {
                 "table_name": "payment_type",
-                "extraction_timestamp": "2025-06-10T14:08:49.910518",
+                "extraction_timestamp": "2025-06-10T20:51:48.938756",
                 "last_updated": "2022-11-03T14:20:49.962000",
                 "file_name": "payment_type_2022-11-3_14-20-49_962000.parquet",
                 "key": "2022/11/3/payment_type_2022-11-3_14-20-49_962000.parquet",
             },
             {
                 "table_name": "payment",
-                "extraction_timestamp": "2025-06-10T14:08:51.330283",
-                "last_updated": "2025-06-10T14:08:10.163000",
-                "file_name": "payment_2025-6-10_14-8-10_163000.parquet",
-                "key": "2025/6/10/payment_2025-6-10_14-8-10_163000.parquet",
+                "extraction_timestamp": "2025-06-10T20:51:52.380596",
+                "last_updated": "2025-06-10T18:01:10.155000",
+                "file_name": "payment_2025-6-10_18-1-10_155000.parquet",
+                "key": "2025/6/10/payment_2025-6-10_18-1-10_155000.parquet",
             },
             {
                 "table_name": "transaction",
-                "extraction_timestamp": "2025-06-10T14:08:57.510390",
-                "last_updated": "2025-06-10T14:08:10.163000",
-                "file_name": "transaction_2025-6-10_14-8-10_163000.parquet",
-                "key": "2025/6/10/transaction_2025-6-10_14-8-10_163000.parquet",
+                "extraction_timestamp": "2025-06-10T20:51:59.679060",
+                "last_updated": "2025-06-10T18:01:10.155000",
+                "file_name": "transaction_2025-6-10_18-1-10_155000.parquet",
+                "key": "2025/6/10/transaction_2025-6-10_18-1-10_155000.parquet",
             },
             {
                 "table_name": "design",
-                "extraction_timestamp": "2025-06-10T14:09:04.570502",
-                "last_updated": "2025-06-10T11:28:09.654000",
-                "file_name": "design_2025-6-10_11-28-9_654000.parquet",
-                "key": "2025/6/10/design_2025-6-10_11-28-9_654000.parquet",
+                "extraction_timestamp": "2025-06-10T20:52:12.199106",
+                "last_updated": "2025-06-10T17:51:09.671000",
+                "file_name": "design_2025-6-10_17-51-9_671000.parquet",
+                "key": "2025/6/10/design_2025-6-10_17-51-9_671000.parquet",
             },
             {
                 "table_name": "sales_order",
-                "extraction_timestamp": "2025-06-10T14:09:09.534016",
-                "last_updated": "2025-06-10T14:08:10.163000",
-                "file_name": "sales_order_2025-6-10_14-8-10_163000.parquet",
-                "key": "2025/6/10/sales_order_2025-6-10_14-8-10_163000.parquet",
+                "extraction_timestamp": "2025-06-10T20:52:15.981714",
+                "last_updated": "2025-06-10T18:01:10.155000",
+                "file_name": "sales_order_2025-6-10_18-1-10_155000.parquet",
+                "key": "2025/6/10/sales_order_2025-6-10_18-1-10_155000.parquet",
             },
             {
                 "table_name": "currency",
-                "extraction_timestamp": "2025-06-10T14:09:16.490573",
+                "extraction_timestamp": "2025-06-10T20:52:22.062585",
                 "last_updated": "2022-11-03T14:20:49.962000",
                 "file_name": "currency_2022-11-3_14-20-49_962000.parquet",
                 "key": "2022/11/3/currency_2022-11-3_14-20-49_962000.parquet",
@@ -297,5 +299,5 @@ if __name__ == "__main__":
         ]
     }
 
-    # result = lambda_handler(test_event, {})
-    # # pprint(orjson.loads(result))
+    result = lambda_handler(test_event, {})
+    pprint(result)
