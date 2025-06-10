@@ -37,7 +37,8 @@ def get_file_from_s3_bucket(client, bucket_name, key, error_map=s3_error_map):
         if status_code != 200:
             return {"error": {"message": f"{status_code}: Unexpected error"}}
 
-        content = response["Body"].read().decode("utf-8")
+        # content = response["Body"].read().decode("utf-8")
+        content = response["Body"].read()
         return {
             "success": {
                 "message": f"File retrieved from s3://{bucket_name}/{key}",
