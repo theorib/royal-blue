@@ -4,7 +4,7 @@ import logging
 # import os
 # from copy import deepcopy
 # from datetime import datetime
-from pprint import pformat, pprint
+from pprint import pprint
 
 # import boto3
 import orjson
@@ -66,9 +66,10 @@ def lambda_handler(event: dict, context: EmptyDict):
         logger.critical(err)
         raise err
 
-    logger.info("Result of loading process:\n%s", pformat(result))
-    return orjson.dumps(result)
+    # logger.info("Result of loading process:\n%s", pformat(result))
+    # return orjson.dumps(result)
 
 
 if __name__ == "__main__":
+    pass
     # result = lambda_handler({}, {})
