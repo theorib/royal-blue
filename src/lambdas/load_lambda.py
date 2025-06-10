@@ -9,7 +9,6 @@ from pprint import pformat, pprint
 # import boto3
 import orjson
 
-from src.db.connection import connect_db
 from src.utilities.typing_utils import EmptyDict
 
 logging.basicConfig(
@@ -31,7 +30,7 @@ def lambda_handler(event: dict, context: EmptyDict):
     # s3_client = boto3.client("s3")
     # PROCESS_ZONE_BUCKET_NAME = os.environ.get("PROCESS_ZONE_BUCKET_NAME")
     # LAMBDA_STATE_BUCKET_NAME = os.environ.get("LAMBDA_STATE_BUCKET_NAME")
-    conn = connect_db("DATAWAREHOUSE")
+    # conn = connect_db("DATAWAREHOUSE")
 
     files_to_process = orjson.loads(json.dumps(event)).get("files_to_process")
     pprint(files_to_process)
