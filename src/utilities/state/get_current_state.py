@@ -27,12 +27,15 @@ def get_current_state(
                 s3_response["error"]["message"]
                 == f"NoSuchKey: {s3_error_map['NoSuchKey']}"
             ):
-                empty_state = {"ingest_state": {}}
+                empty_state = {
+                    "ingest_state": {},
+                    "process_state": {"last_updated": None, "tables": {}},
+                }
                 body = orjson.dumps(empty_state)
 
                 add_file_to_s3_bucket(s3_client, bucket_name, key, body)
 
-                return {"ingest_state": {}}
+                return empty_state
 
             else:
                 raise Exception(s3_response["error"]["message"])
