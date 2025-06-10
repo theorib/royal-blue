@@ -28,6 +28,8 @@ def lambda_handler(event: dict, context: EmptyDict):
     pprint(files_to_process)
     logger.info("Starting transform process for files")
 
+    # !!!!!!!! WE ALWAYS need to insert dimensions first and facts last
+
     result = {
         "files_to_process": [],
         "something_else": "I'm some random value from load_lambda",
