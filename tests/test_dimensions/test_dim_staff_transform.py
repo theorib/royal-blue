@@ -73,7 +73,9 @@ class TestDimStaffDataframe:
         ):
             dim_staff_dataframe(**data)
 
-    @pytest.mark.it("check should raise KeyError when required department column is missing")
+    @pytest.mark.it(
+        "check should raise KeyError when required department column is missing"
+    )
     def test_missing_department_column(self):
         staff_df = pd.DataFrame(
             {
