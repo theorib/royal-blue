@@ -9,8 +9,13 @@ resource "aws_lambda_function" "lambda" {
   timeout          = 200
   environment {
     variables = {
-      PROCESS_ZONE_BUCKET_NAME = var.process_zone_bucket.id
-      LAMBDA_STATE_BUCKET_NAME = var.lambda_state_bucket.id
+      PROCESS_ZONE_BUCKET_NAME  = var.process_zone_bucket.id
+      LAMBDA_STATE_BUCKET_NAME  = var.lambda_state_bucket.id
+      DATAWAREHOUSE_DB_USER     = var.DATAWAREHOUSE_DB_USER
+      DATAWAREHOUSE_DB_PASSWORD = var.DATAWAREHOUSE_DB_PASSWORD
+      DATAWAREHOUSE_DB_HOST     = var.DATAWAREHOUSE_DB_HOST
+      DATAWAREHOUSE_DB_DATABASE = var.DATAWAREHOUSE_DB_DATABASE
+      DATAWAREHOUSE_DB_PORT     = var.DATAWAREHOUSE_DB_PORT
     }
   }
 
