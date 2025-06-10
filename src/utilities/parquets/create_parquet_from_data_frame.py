@@ -26,6 +26,7 @@ def create_parquet_from_data_frame(data_frame: pd.DataFrame):
         error = InvalidDataFrame("ERROR: invalid DataFrame")
         logger.error(error)
         raise error
+
     parquet_file: BytesIO = BytesIO()
     data_frame.to_parquet(parquet_file, engine="pyarrow", compression="gzip")
     parquet_file.seek(0)
