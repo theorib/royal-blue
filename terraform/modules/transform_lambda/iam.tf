@@ -65,14 +65,14 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 data "aws_iam_policy_document" "ingest_zone_bucket_policy_doc" {
   statement {
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = ["${var.ingest_zone_bucket.arn}/*"]
+    actions   = ["s3:PutObject", "s3:GetObject", "s3:ListBucket"]
+    resources = ["${var.ingest_zone_bucket.arn}/*", "${var.ingest_zone_bucket.arn}"]
   }
 }
 
 # Create
 resource "aws_iam_policy" "ingest_zone_bucket_policy" {
-  name_prefix = "s3-policy-${var.function_name}-write-"
+  name_prefix = "s3-policy-${var.function_name}-ingest_zone_bucket-"
   policy      = data.aws_iam_policy_document.ingest_zone_bucket_policy_doc.json
 }
 
@@ -83,7 +83,7 @@ resource "aws_iam_role_policy_attachment" "ingest_zone_bucket_policy_attachment"
 }
 
 # ------------------------------
-# Lambda IAM Policy for S3 State Bucket Write
+# Lambda IAM Policy for S3 State Bucket
 # ------------------------------
 
 # Define
@@ -97,7 +97,7 @@ data "aws_iam_policy_document" "lambda_state_bucket_policy_doc" {
 
 # Create
 resource "aws_iam_policy" "lambda_state_bucket_policy" {
-  name_prefix = "s3-policy-${var.function_name}-put-object-"
+  name_prefix = "s3-policy-${var.function_name}-lambda_state_bucket-"
   policy      = data.aws_iam_policy_document.lambda_state_bucket_policy_doc.json
 }
 
