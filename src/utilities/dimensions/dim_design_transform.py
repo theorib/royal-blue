@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def dim_design_dataframe(dataframes: dict) -> pd.DataFrame:
+def dim_design_dataframe(**dataframes) -> pd.DataFrame:
     """
     Create the design dimension DataFrame from the extracted raw design data.
 
@@ -23,10 +23,13 @@ def dim_design_dataframe(dataframes: dict) -> pd.DataFrame:
         If the 'design' table is missing or any error occurs during transformation.
     """
 
-    design_df = dataframes.get("design")
+    required_keys = ["design"]
 
-    if design_df is None:
-        raise ValueError("Error: Missing design table.")
+    for key in required_keys:
+        if key not in dataframes:
+            raise ValueError(f"Error: Missing required dataframe '{key}'.")
+        
+    design_df = dataframes.get("design")
 
     try:
         dim_design = design_df[
