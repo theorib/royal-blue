@@ -73,7 +73,7 @@ class TestFilterOutValues:
 class TestGetTotesysTableNames:
     @pytest.mark.it("check that it returns a list of strings")
     def test_returns_list_str(self, patched_connect):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
 
         result = get_totesys_table_names(conn)
 
@@ -84,7 +84,7 @@ class TestGetTotesysTableNames:
 
     @pytest.mark.it("check that filtered out names are not in the returned list")
     def test_filtered_values(self, patched_connect):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         table_names_to_filter_out = ["_prisma_migrations"]
 
         result = get_totesys_table_names(conn, table_names_to_filter_out)
@@ -130,7 +130,7 @@ class TestGetTableLastUpdatedTimestamp:
         mock_cursor.fetchone.return_value = {
             "last_updated": datetime(2025, 5, 1, 12, 30)
         }
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
@@ -143,7 +143,7 @@ class TestGetTableLastUpdatedTimestamp:
     )
     def test_(self, patched_connect, mock_cursor):
         mock_cursor.fetchone.side_effect = errors.UndefinedTable("ERROR")
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
@@ -159,7 +159,7 @@ class TestGetTableLastUpdatedTimestamp:
     )
     def test_no(self, patched_connect, mock_cursor):
         mock_cursor.fetchone.return_value = {"last_updated": None}
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         table_name = "currency"
 
         result = get_table_last_updated_timestamp(conn, table_name)
@@ -177,7 +177,7 @@ class TestGetTableData:
         "check that it returns a list of dictionaries with expected keys and values"
     )
     def test_list_of_dict(self):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
 
         result = get_table_data(conn, "currency")
 
@@ -194,7 +194,7 @@ class TestGetTableData:
         "check that it returns an empty list if are no matching results in the database (searching for results within a date in the future)"
     )
     def test_empty_list(self):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
 
         result = get_table_data(
             conn, "currency", datetime.fromisoformat("2100-01-01 01:01:01.001")
@@ -207,7 +207,7 @@ class TestGetTableData:
         "check that it raises an exception if querying results for a table that does not exist"
     )
     def test_exception_table_not_exists(self):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         with pytest.raises(Error) as err:
             get_table_data(conn, "non-existing-table-name")
         assert err.typename == "UndefinedTable"
@@ -217,7 +217,7 @@ class TestGetTableData:
         "check that it raises an error if an invalid datetime object is passed to last_updated "
     )
     def test_invalid_last_updated(self):
-        conn = connect_db()
+        conn = connect_db("TOTESYS")
         with pytest.raises(Error) as err:
             get_table_data(conn, "currency", "123")  # type: ignore
         assert err.typename == "InvalidDatetimeFormat"
