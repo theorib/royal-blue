@@ -44,7 +44,10 @@ class TestGetCurrentState:
         s3, bucket = s3_fixture
 
         result = get_current_state(s3, bucket)
-        assert result == {"ingest_state": {}}
+        assert result == {
+            "ingest_state": {},
+            "process_state": {"last_updated": None, "tables": {}},
+        }
 
     @pytest.mark.it("Returns None for invalid JSON decoding error")
     def test_invalid_json_decode(self, s3_fixture):
