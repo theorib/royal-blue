@@ -82,19 +82,25 @@ def lambda_handler(event: dict, context: EmptyDict):
             df = create_data_frame_from_parquet(parquet)
 
             if file_data["table_name"].startswith("dim"):
-                dims_to_process.append(
-                    {"table_name": file_data["table_name"], "dataframe": df}
-                )
+                dims_to_process.append({
+                    "table_name": file_data["table_name"],
+                    "dataframe": df,
+                })
             else:
-                facts_to_process.append(
-                    {"table_name": file_data["table_name"], "dataframe": df}
+                facts_to_process.append({
+                    "table_name": file_data["table_name"],
+                    "dataframe": df,
+                })
+        with conn:
+            for file_data in dims_to_process:
+                create_db_entries_from_df(
+                    conn, file_data["table_name"], file_data["df"]
                 )
 
-        for file_data in dims_to_process:
-            create_db_entries_from_df(conn, file_data["table_name"], file_data["df"])
-
-        for file_data in facts_to_process:
-            create_db_entries_from_df(conn, file_data["table_name"], file_data["df"])
+            for file_data in facts_to_process:
+                create_db_entries_from_df(
+                    conn, file_data["table_name"], file_data["df"]
+                )
 
     except Exception as err:
         logger.critical(err)
