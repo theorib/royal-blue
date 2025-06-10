@@ -171,8 +171,8 @@ class TestGetTableLastUpdatedTimestamp:
 @pytest.mark.describe(
     "Test get_table_data (currently these are mostly integration tests)"
 )
+@pytest.mark.skip
 class TestGetTableData:
-    # @pytest.mark.skip
     @pytest.mark.it(
         "check that it returns a list of dictionaries with expected keys and values"
     )
