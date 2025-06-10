@@ -37,42 +37,6 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event: EmptyDict, context: EmptyDict):
-    """
-    1. create a db connection
-    2. create an s3 client
-    3. get LAMBDA_STATE_BUCKET_NAME
-    4. get INGEST_ZONE_BUCKET_NAME
-
-    5. get current_state
-      if current_state file does not exist INITIALIZE STATE:
-      create a new current state file with {"ingest_state": {}}
-
-    6. get all table names from Totesys db
-    7. for each table:
-    check state for this table
-
-    IF there is no state for this table
-    we download all data for this table in following steps
-    IF there is state for this table, we get last_updated for this table
-    on next steps we get data from db updated after last_updated timestamp
-
-    get table data from db (with or without last_updated filter)
-
-    get last_updated from the data we just got
-
-    create a data frame from table data
-    create a parquet from data frame
-    upload parquet to s3
-
-    update state entry for that table:
-    update last_updated
-    append to ingest_log
-      filename
-      s3_key
-      last_updated
-
-    """
-
     conn = connect_db("TOTESYS")
     s3_client = boto3.client("s3")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")
@@ -125,15 +89,13 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
                 if response.get("error"):
                     raise response["error"]["raw_response"]  # type: ignore
 
-                new_state_log_entry = (
-                    {
-                        "table_name": table_name,
-                        "extraction_timestamp": extraction_timestamp,
-                        "last_updated": new_table_data_last_updated,
-                        "file_name": filename,
-                        "key": key,
-                    },
-                )
+                new_state_log_entry = {
+                    "table_name": table_name,
+                    "extraction_timestamp": extraction_timestamp,
+                    "last_updated": new_table_data_last_updated,
+                    "file_name": filename,
+                    "key": key,
+                }
 
                 result["files_to_process"].append(new_state_log_entry)
 
@@ -154,6 +116,9 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
         logger.info("Result of extraction process:\n%s", pformat(result))
         logger.info("End of extraction process for all tables")
+        print("result ---->")
+        pprint(result)
+        print("<---- result")
         return orjson.dumps(result)
 
     except Error as err:
