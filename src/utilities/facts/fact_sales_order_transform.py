@@ -1,51 +1,35 @@
 import pandas as pd
 
 
-def get_fact_sales_order_df(extracted_dataframes: dict) -> pd.DataFrame:
-    """
-    Transforms the extracted 'sales_order' data into a fact_sales_order DataFrame.
+def create_fact_sales_order_from_df(
+    data_frame: pd.DataFrame,
+) -> pd.DataFrame:
+    fact_sales_order_df = data_frame.copy()
+    # Create columns
+    # ! When there is an increal update down the line, what id are we going to use????
+    # ! what was the last index used???
+    # fact_sales_order_df["sales_record_id"] = range(1, len(fact_sales_order_df) + 1)
 
-    Parameters
-    ----------
-    extracted_dataframes : dict
-        A dictionary of extracted raw tables keyed by table name.
+    fact_sales_order_df["created_date"] = pd.to_datetime(
+        fact_sales_order_df["created_at"]
+    ).dt.date
+    fact_sales_order_df["last_updated_date"] = pd.to_datetime(
+        fact_sales_order_df["last_updated"]
+    ).dt.date
+    fact_sales_order_df["agreed_payment_date"] = pd.to_datetime(
+        fact_sales_order_df["agreed_payment_date"]
+    ).dt.date
+    fact_sales_order_df["agreed_delivery_date"] = pd.to_datetime(
+        fact_sales_order_df["agreed_delivery_date"]
+    ).dt.date
 
-    Returns
-    -------
-    pd.DataFrame
-        The transformed fact_sales_order DataFrame with selected fields.
+    fact_sales_order_df["created_time"] = pd.to_datetime(
+        fact_sales_order_df["created_at"]
+    ).dt.time
+    fact_sales_order_df["last_updated_time"] = pd.to_datetime(
+        fact_sales_order_df["last_updated"]
+    ).dt.time
 
-    Raises
-    ------
-    ValueError
-        If 'sales_order' is missing or required columns are not present.
-    """
-    sales_df = extracted_dataframes.get("sales_order")
+    fact_sales_order_df.drop(["created_at", "last_updated"], axis=1, inplace=True)
 
-    if sales_df is None:
-        raise ValueError("Missing 'sales_order' table from extracted data.")
-
-    required_columns = [
-        "sales_order_id",
-        "created_at",
-        "last_updated",
-        "design_id",
-        "staff_id",
-        "counterparty_id",
-        "units_sold",
-        "unit_price",
-        "currency_id",
-        "agreed_delivery_date",
-        "agreed_payment_date",
-        "agreed_delivery_location_id",
-    ]
-
-    if not set(required_columns).issubset(sales_df.columns):
-        missing = set(required_columns) - set(sales_df.columns)
-        raise ValueError(f"Missing columns in 'sales_order': {missing}")
-
-    # ! all dates need to be converted into dim_date
-    # ! we discard created_at, last_updated need to be converted to entries in dim_date and subsequently feed: created_date, created_time, last_updated_date, last_updated_time
-    # ! agreed_delivery_date and agreed_payment_date, need to be converted from string to datetime, from that datetime an entry in dim_date has to be created if it doesn't exist and that feeds, agreed_delivery_date, agreed_payment_date
-    fact_sales_order = sales_df[required_columns].copy()
-    return fact_sales_order
+    return fact_sales_order_df
