@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "process_zone_bucket_policy_doc" {
 
 # Create
 resource "aws_iam_policy" "process_zone_bucket_policy" {
-  name_prefix = "s3-policy-${var.function_name}-write-"
+  name_prefix = "s3-policy-${var.function_name}-process_zone_bucket-"
   policy      = data.aws_iam_policy_document.process_zone_bucket_policy_doc.json
 }
 
@@ -97,7 +97,7 @@ data "aws_iam_policy_document" "lambda_state_bucket_policy_doc" {
 
 # Create
 resource "aws_iam_policy" "lambda_state_bucket_policy" {
-  name_prefix = "s3-policy-${var.function_name}-put-object-"
+  name_prefix = "s3-policy-${var.function_name}-lambda_state_bucket-"
   policy      = data.aws_iam_policy_document.lambda_state_bucket_policy_doc.json
 }
 
