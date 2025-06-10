@@ -116,9 +116,7 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
         logger.info("Result of extraction process:\n%s", pformat(result))
         logger.info("End of extraction process for all tables")
-        print("result ---->")
-        pprint(result)
-        print("<---- result")
+
         return orjson.dumps(result)
 
     except Error as err:
@@ -131,7 +129,4 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
 
 if __name__ == "__main__":
-    from pprint import pprint
-
-    result = lambda_handler({}, {})
-    pprint(result)
+    pass
