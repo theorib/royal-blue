@@ -54,7 +54,7 @@ class TestSetCurrentState:
 
         assert data == new_state
 
-    @pytest.mark.it("Raises an exception when add_file_to_s3_bucket returns an error")
+    @pytest.mark.it("Raises an exception when add_file_to_s3_bucket returns an error.")
     def test_add_file_returns_error(self, s3_fixture):
         s3, bucket = s3_fixture
         mock_state = {"some": "state"}
