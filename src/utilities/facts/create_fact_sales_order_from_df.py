@@ -31,5 +31,6 @@ def create_fact_sales_order_from_df(
     ).dt.time
 
     fact_sales_order_df.drop(["created_at", "last_updated"], axis=1, inplace=True)
+    fact_sales_order_df.rename(columns={"staff_id": "sales_staff_id"}, inplace=True)
 
     return fact_sales_order_df
