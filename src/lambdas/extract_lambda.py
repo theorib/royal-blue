@@ -166,7 +166,8 @@ def lambda_handler(event: EmptyDict, context: EmptyDict):
 
 
 if __name__ == "__main__":
-    from pprint import pprint
+    pass
+    # from pprint import pprint
 
-    result = lambda_handler({}, {})
-    pprint(result)
+    # result = lambda_handler({}, {})
+    # pprint(result)
