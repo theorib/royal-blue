@@ -76,10 +76,10 @@ def lambda_handler(event: dict, context: EmptyDict):
         facts_to_process = []
 
         for file_data in files_to_process:
-            parquet = get_file_from_s3_bucket(
+            response = get_file_from_s3_bucket(
                 s3_client, bucket_name=PROCESS_ZONE_BUCKET_NAME, key=file_data["key"]
             )
-            df = create_data_frame_from_parquet(parquet)
+            df = create_data_frame_from_parquet(response["success"]["data"])
 
             if file_data["table_name"].startswith("dim"):
                 dims_to_process.append(
