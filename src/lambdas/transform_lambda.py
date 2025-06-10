@@ -16,7 +16,7 @@ from src.utilities.dimensions.dim_currency_transform import dim_currency_datafra
 from src.utilities.dimensions.dim_design_transform import dim_design_dataframe
 from src.utilities.dimensions.dim_staff_transform import dim_staff_dataframe
 from src.utilities.extract_lambda_utils import create_parquet_metadata
-from src.utilities.facts.fact_sales_order_transform import get_fact_sales_order_df
+from src.utilities.facts.create_fact_sales_order_from_df import get_fact_sales_order_df
 from src.utilities.parquets.create_data_frame_from_parquet import (
     create_data_frame_from_parquet,
 )
