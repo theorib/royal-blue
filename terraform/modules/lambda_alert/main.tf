@@ -1,4 +1,4 @@
-resource "aws_cloudwatch_log_group""critical_log_group"{
+resource "aws_cloudwatch_log_group" "critical_log_group" {
   name = "lambda_logs"
 
 }
