@@ -24,7 +24,7 @@ def dim_location_dataframe(**dataframes) -> pd.DataFrame:
         If the 'address' table is missing or any error occurs during transformation.
     """
 
-    required_keys = ['address']
+    required_keys = ["address"]
     for key in required_keys:
         if key not in dataframes:
             raise ValueError(f"Error: Missing required dataframe '{key}'.")

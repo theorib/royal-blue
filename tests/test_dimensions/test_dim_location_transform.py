@@ -1,9 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.utilities.dimensions.dim_location_transform import (
-    dim_location_dataframe,
-)
+from src.utilities.dimensions.dim_location_transform import dim_location_dataframe
 
 
 @pytest.fixture
@@ -27,7 +25,7 @@ class TestDimLocationDataframe:
     @pytest.mark.it("Should return a dataframe with the correct columns")
     def test_dim_address_in_DF(self, mock_address_df):
         test_extracted_dataframes = {"address": mock_address_df}
-        result = dim_location_dataframe(test_extracted_dataframes)
+        result = dim_location_dataframe(**test_extracted_dataframes)
 
         assert isinstance(result, pd.DataFrame)
 
@@ -48,8 +46,10 @@ class TestDimLocationDataframe:
 
     @pytest.mark.it("Should raise ValueError if the address table is missing")
     def test_dim_address_missing_address_table(self):
-        with pytest.raises(ValueError, match="Missing address table"):
-            dim_location_dataframe({})
+        with pytest.raises(
+            ValueError, match="Error: Missing required dataframe 'address'."
+        ):
+            dim_location_dataframe(**{})
 
     @pytest.mark.it("Should return an empty dataframe if the address table is empty")
     def test_dim_address_empty_DF(self):
@@ -65,7 +65,7 @@ class TestDimLocationDataframe:
                 "phone",
             ]
         )
-        result = dim_location_dataframe({"address": test_empty_dataframe})
+        result = dim_location_dataframe(**{"address": test_empty_dataframe})
 
         assert result.empty
 
@@ -73,7 +73,7 @@ class TestDimLocationDataframe:
     def test_dim_address_partial_address_entry(self, mock_address_df):
         mock_address_df.loc[0, "phone"] = None
         test_extracted_dataframes = {"address": mock_address_df}
-        result = dim_location_dataframe(test_extracted_dataframes)
+        result = dim_location_dataframe(**test_extracted_dataframes)
 
         assert result.isnull().values.any()
 
@@ -83,7 +83,7 @@ class TestDimLocationDataframe:
             [mock_address_df, mock_address_df], ignore_index=True
         )
         test_extracted_dataframes = {"address": test_duplicated_df}
-        result = dim_location_dataframe(test_extracted_dataframes)
+        result = dim_location_dataframe(**test_extracted_dataframes)
 
         assert len(result) == 2
 
@@ -93,7 +93,7 @@ class TestDimLocationDataframe:
         test_extracted_dataframes = {"address": mock_address_df}
 
         with pytest.raises(ValueError, match="Error creating dim_location"):
-            dim_location_dataframe(test_extracted_dataframes)
+            dim_location_dataframe(**test_extracted_dataframes)
 
     @pytest.mark.it("Should raise an error if a column is missing")
     def test_dim_address_missing_columns(self, mock_address_df):
@@ -101,13 +101,13 @@ class TestDimLocationDataframe:
         test_extracted_dataframes = {"address": mock_address_df}
 
         with pytest.raises(ValueError, match="Error creating dim_location"):
-            dim_location_dataframe(test_extracted_dataframes)
+            dim_location_dataframe(**test_extracted_dataframes)
 
     @pytest.mark.it("Should ignore unrelated columns")
     def test_dim_address_unrelated_columns(self, mock_address_df):
         mock_address_df["unrelated_column"] = ["unrelated_1", "unrelated_2"]
         test_extracted_dataframes = {"address": mock_address_df}
 
-        result = dim_location_dataframe(test_extracted_dataframes)
+        result = dim_location_dataframe(**test_extracted_dataframes)
 
         assert "unrelated_column" not in result.columns

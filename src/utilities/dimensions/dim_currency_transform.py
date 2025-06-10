@@ -25,11 +25,11 @@ def dim_currency_dataframe(**dataframes):
             "RUB": "Russian Ruble",
             "TRY": "Turkish Lira",
         }
-        required_keys = ['currency']
+        required_keys = ["currency"]
         for key in required_keys:
             if key not in dataframes:
                 raise ValueError(f"Error: Missing required dataframe '{key}'.")
-            
+
         currency_df = dataframes.get("currency")
 
         lookup_df = (

@@ -1,17 +1,51 @@
-def dim_staff_dataframe(dataframes: dict):
+import pandas as pd
+
+
+def dim_staff_dataframe(**dataframes):
+    """
+    Constructs the staff dimension table by integrating staff, department, address,
+    and purchase order data into a clean OLAP-ready format.
+
+    This function expects dataframes for 'staff', 'department', 'address', and 'purchase_order',
+    and selects then returns relevant OLAP fields for the staff dimension.
+
+    Parameters:
+    -----------
+    **dataframes : dict
+        A dictionary of named DataFrames, expected to contain:
+        - 'staff': DataFrame with at least 'staff_id', 'first_name', 'last_name', 'department_id', 'email_address'
+        - 'department': DataFrame with 'department_id' and 'department_name'
+        - 'address': DataFrame with 'address_id', 'city', and 'country'
+        - 'purchase_order': DataFrame with 'staff_id' and 'agreed_delivery_location_id'
+
+    Returns:
+    --------
+    pd.DataFrame
+        A dimension-style DataFrame containing:
+        - 'staff_id'
+        - 'first_name'
+        - 'last_name'
+        - 'department_name'
+        - 'location' (formatted as "City, Country")
+        - 'email_address'
+
+    Raises:
+    -------
+    ValueError
+        If any of the required dataframes are missing from input.
+    Exception
+        For any unexpected error encountered during merging or transformation.
+    """
+
+    required_keys = ["staff", "department"]
+    for key in required_keys:
+        if key not in dataframes:
+            raise ValueError(f"Error: Missing required dataframe '{key}'.")
+
     staff_df = dataframes.get("staff")
     departments_df = dataframes.get("department")
     address_df = dataframes.get("address")
     purchase_order_df = dataframes.get("purchase_order")
-
-    if staff_df is None:
-        raise ValueError("Error:")
-    if departments_df is None:
-        raise ValueError("Error:")
-    if address_df is None:
-        raise ValueError()
-    if purchase_order_df is None:
-        raise ValueError()
 
     try:
         staff_df = staff_df.merge(
