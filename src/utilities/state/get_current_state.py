@@ -38,8 +38,9 @@ def get_current_state(
                 == f"NoSuchKey: {s3_error_map['NoSuchKey']}"
             ):
                 empty_state = {
-                    "ingest_state": {},
+                    "ingest_state": {"last_updated": None, "tables": {}},
                     "transform_state": {"last_updated": None, "tables": {}},
+                    "load_state": {"last_updated": None, "tables": {}},
                 }
                 body = orjson.dumps(empty_state)
 

@@ -41,7 +41,10 @@ def initialize_transform_state(state, table_names):
     initialized_state["transform_state"] = {"last_updated": None, "tables": {}}
 
     for table_name in table_names:
-        initialized_state["transform_state"]["tables"][table_name] = {}
+        initialized_state["transform_state"]["tables"][table_name] = {
+            "last_updated": None,
+            "transform_log": [],
+        }
     return initialized_state
 
 
@@ -59,7 +62,7 @@ def add_log_to_result_and_state(
     state["transform_state"]["tables"][table_name]["transformation_timestamp"] = (
         processing_timestamp
     )
-    state["transform_state"]["tables"][table_name]["process_log"] = log
+    state["transform_state"]["tables"][table_name]["transform_log"].append(log)
 
     state["transform_state"]["last_updated"] = last_updated
 
@@ -92,17 +95,6 @@ def initialize_dim_date(
         processing_timestamp=dim_date_transformation_time_stamp,
         table_name=new_table_name,
     )
-
-    # result["files_to_process"].append(dim_date_log_item)
-    # final_state["transform_state"]["tables"]["dim_date"] = {}
-    # final_state["transform_state"]["tables"]["dim_date"]["transformation_timestamp"] = (
-    #     dim_date_transformation_time_stamp
-    # )
-    # final_state["transform_state"]["tables"]["dim_date"]["process_log"] = [
-    #     dim_date_log_item
-    # ]
-
-    # final_state["transform_state"]["last_updated"] = dim_date_transformation_time_stamp
 
 
 def get_log_item_df_s3_upload(
