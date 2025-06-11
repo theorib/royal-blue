@@ -2,7 +2,7 @@ import pandas as pd
 import pytest
 
 from src.utilities.facts.create_fact_sales_order_from_df import (
-create_fact_sales_order_from_df,
+    create_fact_sales_order_from_df,
 )
 
 

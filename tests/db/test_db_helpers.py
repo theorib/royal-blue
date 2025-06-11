@@ -2,9 +2,9 @@ import logging
 from copy import copy
 from datetime import datetime
 from unittest.mock import MagicMock
-from psycopg.rows import DictRow
+
 import pytest
-from psycopg import Connection, Error, errors
+from psycopg import Connection, errors
 
 from src.db.connection import connect_db
 from src.db.db_helpers import (
@@ -217,4 +217,3 @@ class TestGetTableDataMocked:
         result = get_table_data(mock_conn, "currency", datetime(2100, 1, 1))
 
         assert result == []
-

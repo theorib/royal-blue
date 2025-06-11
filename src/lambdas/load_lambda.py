@@ -71,15 +71,19 @@ def lambda_handler(event: dict, context: EmptyDict):
             )
 
             if file_data["table_name"].startswith("dim"):
-                dims_to_process.append({
-                    "table_name": file_data["table_name"],
-                    "data_frame": df,
-                })
+                dims_to_process.append(
+                    {
+                        "table_name": file_data["table_name"],
+                        "data_frame": df,
+                    }
+                )
             else:
-                facts_to_process.append({
-                    "table_name": file_data["table_name"],
-                    "data_frame": df,
-                })
+                facts_to_process.append(
+                    {
+                        "table_name": file_data["table_name"],
+                        "data_frame": df,
+                    }
+                )
 
         with conn:
             for file_data in dims_to_process:
