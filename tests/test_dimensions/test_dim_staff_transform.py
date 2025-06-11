@@ -57,6 +57,55 @@ class TestDimStaffDataframe:
         assert row["location"] == "Building A"
         assert row["email_address"] == "john.doe@example.com"
 
+    @pytest.mark.it("check .drop_duplicates() removes duplicate rows")
+    def test_drop_duplicates_effect(self):
+        staff_df = pd.DataFrame(
+            {
+                "staff_id": [1, 1],
+                "first_name": ["John", "John"],
+                "last_name": ["Doe", "Doe"],
+                "department_id": [100, 100],
+                "email_address": ["john.doe@example.com", "john.doe@example.com"],
+            }
+        )
+        department_df = pd.DataFrame(
+            {
+                "department_id": [100],
+                "department_name": ["Engineering"],
+                "location": ["Building A"],
+            }
+        )
+        data = {"staff": staff_df, "department": department_df}
+        result = dim_staff_dataframe(**data)
+        # Should only have one unique row after drop_duplicates
+        assert result.shape[0] == 1
+
+    @pytest.mark.it("check left join behavior with unmatched department_id")
+    def test_left_join_with_no_matching_department(self):
+        staff_df = pd.DataFrame(
+            {
+                "staff_id": [1, 2],
+                "first_name": ["John", "Jane"],
+                "last_name": ["Doe", "Smith"],
+                "department_id": [100, 999],  # 999 does not exist in department_df
+                "email_address": ["john.doe@example.com", "jane.smith@example.com"],
+            }
+        )
+        department_df = pd.DataFrame(
+            {
+                "department_id": [100],
+                "department_name": ["Engineering"],
+                "location": ["Building A"],
+            }
+        )
+        data = {"staff": staff_df, "department": department_df}
+        result = dim_staff_dataframe(**data)
+        assert result.shape[0] == 2
+        # For unmatched department_id, department_name and location should be NaN
+        unmatched_row = result[result["staff_id"] == 2].iloc[0]
+        assert pd.isna(unmatched_row["department_name"])
+        assert pd.isna(unmatched_row["location"])
+
     @pytest.mark.it("check should raise ValueError when staff table is missing")
     def test_missing_staff(self):
         data = {"department": pd.DataFrame()}
@@ -99,3 +148,15 @@ class TestDimStaffDataframe:
 
         with pytest.raises(KeyError):
             dim_staff_dataframe(**data)
+
+    @pytest.mark.it("check should catch generic exceptions and raise them")
+    def test_generic_exception(self, valid_dataframes, monkeypatch):
+        # monkeypatch merge to throw generic Exception
+        def raise_exception(*args, **kwargs):
+            raise Exception("Unexpected error")
+
+        monkeypatch.setattr(
+            valid_dataframes["staff"], "merge", raise_exception
+        )
+        with pytest.raises(Exception, match="Error creating dim_staff: Unexpected error"):
+            dim_staff_dataframe(**valid_dataframes)
