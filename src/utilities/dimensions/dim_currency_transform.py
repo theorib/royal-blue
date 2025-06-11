@@ -1,7 +1,22 @@
 import pandas as pd
 
 
-def dim_currency_dataframe(**dataframes):
+def dim_currency_dataframe(**dataframes) -> pd.DataFrame:
+    """
+    Create a currency dimension table with currency codes and names.
+
+    Args:
+        dataframes: Keyword arguments containing:
+            - currency: DataFrame with 'currency_id' and 'currency_code'.
+
+    Returns:
+        A DataFrame with 'currency_id', 'currency_code', and 'currency_name'.
+
+    Raises:
+        ValueError: If the 'currency' dataframe is missing.
+        KeyError: If required columns are missing from input.
+        Exception: For any other unexpected error.
+    """
     try:
         currency_lookup = {
             "USD": "US Dollar",

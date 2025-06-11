@@ -3,25 +3,17 @@ import pandas as pd
 
 def dim_location_dataframe(**dataframes) -> pd.DataFrame:
     """
-    Create the location dimension DataFrame from the extracted raw address data.
+    Create a location dimension DataFrame from raw address data.
 
-    Parameters:
-    -----------
-    dataframes : dict
-        Dictionary containing raw DataFrames extracted from source tables.
-        Must contain an 'address' DataFrame.
+    Args:
+        dataframes: Keyword arguments containing:
+            - address: DataFrame with address fields.
 
     Returns:
-    --------
-    pd.DataFrame
-        A DataFrame representing the location dimension with columns:
-        'address_id', 'address_line_1', 'address_line_2', 'district', 'city',
-        'postal_code', 'country', and 'phone'.
+        A DataFrame with location dimension columns and renamed 'location_id'.
 
     Raises:
-    -------
-    ValueError
-        If the 'address' table is missing or any error occurs during transformation.
+        ValueError: If 'address' DataFrame is missing or transformation fails.
     """
 
     required_keys = ["address"]

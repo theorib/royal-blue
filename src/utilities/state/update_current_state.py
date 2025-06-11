@@ -4,19 +4,21 @@ from src.utilities.state.get_current_state import get_current_state
 from src.utilities.state.set_current_state import set_current_state
 
 
-def update_state(parquet_files, s3_client, bucket_name):
+def update_state(parquet_files, s3_client, bucket_name) -> dict:
     """
+    Updates the ingest state in S3 with new parquet file metadata.
+
     Args:
-        parquet_files (list): List of file metadata dictionaries. Each dict should have:
-            - 'table_name': str
-            - 'timestamp': str
-            - 'file_name': str
-            - optionally 'key': str
-        s3_client: Boto3 S3 client for accessing S3.
-        bucket_name (str): Name of the S3 bucket.
+        parquet_files (list of dict): Each dict must contain:
+            - 'table_name' (str)
+            - 'timestamp' (str)
+            - 'file_name' (str)
+            - optionally 'key' (str)
+        s3_client: Boto3 S3 client instance.
+        bucket_name (str): S3 bucket name.
 
     Returns:
-        dict: The updated state.
+        dict: The updated ingest state dictionary.
     """
 
     current_state = get_current_state(s3_client, bucket_name) or {"ingest_state": []}
@@ -38,16 +40,16 @@ def update_state(parquet_files, s3_client, bucket_name):
     return new_state
 
 
-def build_log_entry(file_entry):
+def build_log_entry(file_entry) -> dict:
     """
-    Constructs a minimal log entry dictionary from a single parquet file entry.
+    Builds a log entry dict from a parquet file metadata dict.
 
     Args:
-        file_entry (dict): Dictionary containing metadata about a single parquet file.
-            Expected keys: 'file_name', 'timestamp', optionally 'key'.
+        file_entry (dict): Metadata for a parquet file, with keys:
+            'file_name', 'timestamp', optionally 'key'.
 
     Returns:
-        dict: A dictionary representing a single log entry for the ingest log.
+        dict: Minimal log entry with file_name, timestamp, and optional key.
     """
 
     entry = {"file_name": file_entry["file_name"], "timestamp": file_entry["timestamp"]}
@@ -57,17 +59,16 @@ def build_log_entry(file_entry):
     return entry
 
 
-def update_log_entry(existing_entry, file_entry):
+def update_log_entry(existing_entry, file_entry) -> dict:
     """
-    Returns a new updated ingest log entry for a given table without mutating the input.
+    Creates a new ingest log entry for a table, appending new file metadata.
 
     Args:
-        existing_entry (dict or None): The current ingest state for a table, or None if it doesn't exist.
-        file_entry (dict): Metadata for a single parquet file.
-            Expected keys: 'table_name', 'timestamp', 'file_name', optionally 'key'.
+        existing_entry (dict or None): Current ingest state entry for a table.
+        file_entry (dict): Parquet file metadata including 'table_name', 'timestamp', 'file_name', optionally 'key'.
 
     Returns:
-        dict: A new state entry for the table.
+        dict: Updated ingest state entry with appended log and updated last_updated.
     """
     table_name = file_entry["table_name"]
     log_entry = build_log_entry(file_entry)

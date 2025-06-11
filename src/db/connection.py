@@ -11,10 +11,18 @@ logger.setLevel(logging.INFO)
 
 def connect_db(db_source: Literal["TOTESYS", "DATAWAREHOUSE"]) -> Connection[DictRow]:
     """
-    Connects to either the TOTESYS or DATAWAREHOUSE database using environment variables.
-    Returns a psycopg connection with rows as dictionaries.
+    Connect to the TOTESYS or DATAWAREHOUSE database using environment variables.
 
-    Raises a ValueError if the db_source is invalid.
+    Args:
+        db_source: Either "TOTESYS" or "DATAWAREHOUSE".
+
+    Returns:
+        A psycopg connection with rows returned as dictionaries.
+
+    Raises:
+        ValueError: If db_source is not valid.
+        Error: If a database error occurs.
+        Exception: For any other error.
     """
     if db_source not in ["TOTESYS", "DATAWAREHOUSE"]:
         raise ValueError(

@@ -1,4 +1,7 @@
+from typing import Dict
+
 import boto3
+import pandas as pd
 
 from src.utilities.parquets.create_data_frame_from_parquet import (
     create_data_frame_from_parquet,
@@ -9,35 +12,24 @@ BUCKET_NAME = "ingestion-zone-20250530151335299400000005"
 client = boto3.client("s3")
 
 
-def extract_dataframes_from_event(client, event):
+def extract_dataframes_from_event(client, event) -> Dict[str, pd.DataFrame]:
     """
-    Extracts data frames from a list of event table metadata by retrieving Parquet files
-    from S3 and converting them to Pandas DataFrames.
+    Extracts data from a list of S3 Parquet file metadata and returns table-specific DataFrames.
 
-    Parameters:
-    ----------
-    client : boto3.client
-        The S3 client used to fetch the files.
-
-    event : list of dict
-        A list of dictionaries, each representing a table to be extracted.
-        Each dictionary must contain the following keys:
-            - 'table_name' (str): The name of the table.
-            - 'extraction_timestamp' (str): The timestamp of data extraction.
-            - 'last_updated' (str): The last updated timestamp for the table data.
-            - 'file_name' (str): The file name of the Parquet file in S3.
-            - 'key' (str): The S3 key (path) to the Parquet file.
+    Args:
+        client (BaseClient): A Boto3 S3 client instance.
+        event (List[Dict[str, str]]): List of metadata dicts, each containing:
+            - 'table_name': str
+            - 'extraction_timestamp': str
+            - 'last_updated': str
+            - 'file_name': str
+            - 'key': str (S3 object path)
 
     Returns:
-    -------
-    dict
-        A dictionary where each key is a table name (str) and the value is the
-        corresponding Pandas DataFrame extracted from the Parquet file.
+        Dict[str, pd.DataFrame]: A dictionary mapping each table name to its corresponding DataFrame.
 
     Raises:
-    ------
-    Exception
-        If any error occurs while processing any of the tables in the event list.
+        Exception: If a table's data cannot be fetched or converted from S3.
     """
     extracted_data_frames = {}
 

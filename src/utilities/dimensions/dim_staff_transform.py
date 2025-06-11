@@ -1,34 +1,22 @@
-def dim_staff_dataframe(**dataframes):
+import pandas as pd
+
+
+def dim_staff_dataframe(**dataframes) -> pd.DataFrame:
     """
-    Constructs the staff dimension table by merging staff data with department names.
+    Build the staff dimension table by merging staff data with department details.
 
-    This function expects DataFrames for 'staff' and 'department' only.
-    It merges staff with their corresponding departments and selects key fields
-    for OLAP-friendly dimension usage.
-
-    Parameters:
-    -----------
-    **dataframes : dict
-        A dictionary of named DataFrames, expected to contain:
-        - 'staff': DataFrame with at least 'staff_id', 'first_name', 'last_name', 'department_id', 'email_address'
-        - 'department': DataFrame with 'department_id', 'department_name' and 'location'
+    Args:
+        dataframes: Keyword arguments containing:
+            - staff: DataFrame with 'staff_id', 'first_name', 'last_name', 'department_id', 'email_address'.
+            - department: DataFrame with 'department_id', 'department_name', 'location'.
 
     Returns:
-    --------
-    pd.DataFrame
-        A dimension-style DataFrame containing:
-        - 'staff_id'
-        - 'first_name'
-        - 'last_name'
-        - 'department_name'
-        - 'email_address'
+        A DataFrame with staff dimension columns including department name and location.
 
     Raises:
-    -------
-    ValueError
-        If any of the required dataframes are missing from input.
-    Exception
-        For any unexpected error encountered during merging or transformation.
+        ValueError: If required DataFrames are missing.
+        KeyError: If expected columns are missing during merge.
+        Exception: For other unexpected errors during processing.
     """
     required_keys = ["staff", "department"]
 

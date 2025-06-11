@@ -1,33 +1,29 @@
+from typing import Union
+
 from botocore.exceptions import ClientError
 
 from src.utilities.s3.s3_error_map import s3_error_map
 
 
-def get_file_from_s3_bucket(client, bucket_name, key, error_map=s3_error_map):
-    """Retrieves a file object from the specified S3 bucket.
-
-    This function attempts to download the content of an object stored in an Amazon S3 bucket
-    using the given bucket name and object key.
+def get_file_from_s3_bucket(
+    client, bucket_name, key, error_map=s3_error_map
+) -> dict[str, dict[str, Union[str, bytes]]]:
+    """
+    Retrieves a file object from the specified S3 bucket.
 
     Args:
-        s3_client: A Boto3 S3 client instance used to interact with AWS S3.
-        bucket_name: The name of the S3 bucket (string).
-        key: The key (i.e., path/filename) of the object to retrieve (string).
+        client (BaseClient): Boto3 S3 client instance.
+        bucket_name (str): Name of the S3 bucket.
+        key (str): Key (path/filename) of the S3 object.
+        error_map (dict, optional): Mapping of S3 error codes to messages.
 
     Returns:
-        dict: A JSON-style dictionary with the result of the operation, e.g.:
-        {
-            "success": {
-                "message": "File retrieved from s3://bucket_name/key",
-                "data": <bytes or string content of the file>
-            }
-        }
-        or
-        {
-            "error": {
-                "message": "Description of the error that occurred"
-            }
-        }
+        dict: A dictionary with either:
+            - "success": containing message and raw file content as bytes,
+            - or "error": containing error message.
+
+    Raises:
+    None. Errors are caught and returned as part of the response dictionary.
     """
 
     try:

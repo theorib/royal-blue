@@ -9,7 +9,23 @@ from src.db.connection import connect_db
 logger = logging.getLogger(__name__)
 
 
-def create_db_entries_from_df(conn: Connection[DictRow], table_name, df: pd.DataFrame):
+def create_db_entries_from_df(
+    conn: Connection[DictRow], table_name: str, df: pd.DataFrame
+) -> None:
+    """
+    Inserts rows from a DataFrame into a specified PostgreSQL table using psycopg.
+
+    Args:
+        conn (Connection[DictRow]): An open psycopg database connection.
+        table_name (str): The name of the database table to insert into.
+        df (pd.DataFrame): The DataFrame containing the rows to insert.
+
+    Returns:
+        None
+
+    Raises:
+        Logs errors if insertion fails; rolls back the transaction.
+    """
     with conn.cursor(row_factory=tuple_row) as cursor:
         if df.empty:
             logger.info(f"No entries available for {table_name}.")
@@ -42,7 +58,20 @@ def create_db_entries_from_df(conn: Connection[DictRow], table_name, df: pd.Data
 
 if __name__ == "__main__":
 
-    def dim_currency_dataframe(data_frame: pd.DataFrame):
+    def dim_currency_dataframe(data_frame: pd.DataFrame) -> pd.DataFrame:
+        """
+        Transforms a currency DataFrame by enriching it with currency names.
+
+        Args:
+            data_frame (pd.DataFrame): DataFrame containing at least a 'currency_code' column.
+
+        Returns:
+            pd.DataFrame: A dimension table with 'currency_id', 'currency_code', and 'currency_name'.
+
+        Raises:
+            ValueError: If input DataFrame is None.
+        """
+
         currency_lookup = {
             "USD": "US Dollar",
             "EUR": "Euro",
@@ -88,24 +117,17 @@ if __name__ == "__main__":
 
     def dim_design_dataframe(data_frame: pd.DataFrame) -> pd.DataFrame:
         """
-        Create the design dimension DataFrame from the extracted raw design data.
+        Creates a design dimension DataFrame from raw design data.
 
-        Parameters:
-        -----------
-        dataframes : dict
-            Dictionary containing raw DataFrames extracted from source tables.
-            Must contain a 'design' DataFrame.
+        Args:
+            data_frame (pd.DataFrame): Raw design table with required columns:
+                'design_id', 'design_name', 'file_location', 'file_name'.
 
         Returns:
-        --------
-        pd.DataFrame
-            A DataFrame representing the design dimension with columns:
-            'design_id', 'design_name', 'file_location', 'file_name'.
+            pd.DataFrame: Cleaned and deduplicated DataFrame with selected columns.
 
         Raises:
-        -------
-        ValueError
-            If the 'design' table is missing or any error occurs during transformation.
+            ValueError: If input DataFrame is missing or transformation fails.
         """
 
         design_df = data_frame
@@ -123,7 +145,21 @@ if __name__ == "__main__":
         except Exception as e:
             raise ValueError(f"Error creating dim_design: {e}")
 
-    def dim_date_dataframe(start_date: str, end_date: str):
+    def dim_date_dataframe(start_date: str, end_date: str) -> pd.DataFrame:
+        """
+        Creates a date dimension DataFrame between two dates.
+
+        Args:
+            start_date (str): Start date string in a format accepted by pd.date_range.
+            end_date (str): End date string in a format accepted by pd.date_range.
+
+        Returns:
+            pd.DataFrame: A DataFrame with one row per date and time-based attributes.
+
+        Raises:
+            ValueError: If date range construction fails.
+        """
+
         all_dates = pd.date_range(
             start=start_date, end=end_date, tz="Europe/London", normalize=True
         )
@@ -170,9 +206,3 @@ if __name__ == "__main__":
 
     with conn:
         pass
-        # print("currency_df", currency_df)
-        # pprint(str(datetime.now()))
-        # pprint((dim_date_df["date_id"][0]))
-        # create_db_entries_from_df(conn, "dim_currency", dim_currency_df)
-        # create_db_entries_from_df(conn, "dim_design", dim_design_df)
-        # create_db_entries_from_df(conn, "dim_date", dim_date_df)
