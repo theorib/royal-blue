@@ -39,7 +39,7 @@ def get_current_state(
             ):
                 empty_state = {
                     "ingest_state": {},
-                    "process_state": {"last_updated": None, "tables": {}},
+                    "transform_state": {"last_updated": None, "tables": {}},
                 }
                 body = orjson.dumps(empty_state)
 

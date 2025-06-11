@@ -84,6 +84,10 @@ def lambda_handler(event, context):
             final_state=final_state,
         )
 
+    logger.info(
+        f"Running transform process for {[entry.table_name for entry in files_to_process]} table(s)."
+    )
+
     all_tables_dfs: dict = get_dataframes_from_files_to_process(
         s3_client,
         INGEST_ZONE_BUCKET_NAME,  # type: ignore
@@ -93,6 +97,8 @@ def lambda_handler(event, context):
     for file_to_process in files_to_process:
         table_name = file_to_process.table_name
         last_updated = file_to_process.last_updated
+
+        logger.info(f"Running transform on {table_name}.")
 
         match table_name:
             case "counterparty":
@@ -138,15 +144,20 @@ def lambda_handler(event, context):
             create_parquet_from_df_func=create_parquet_from_data_frame,  # type: ignore
         )
         add_log_to_result_and_state(
-            log=log_item,
+            log=log_item,  # type: ignore
             result=result,
             state=final_state,
             last_updated=transformation_timestamp,
             processing_timestamp=transformation_timestamp,
             table_name=table_name,
         )
+        logger.info(
+            f"Transform for {table_name} --> {new_table_name} completed with {len(df)} new records transformed."
+        )
 
     set_current_state(final_state, LAMBDA_STATE_BUCKET_NAME, s3_client)
+
+    logger.info("Transform process successfully ended.")
 
     return orjson.dumps(result)
 
@@ -155,81 +166,32 @@ if __name__ == "__main__":
     test_event = {
         "files_to_process": [
             {
-                "table_name": "counterparty",
-                "extraction_timestamp": "2025-06-11T13:49:02.425852",
-                "last_updated": "2022-11-03T14:20:51.563000",
-                "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
-                "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
-            },
-            {
-                "table_name": "address",
-                "extraction_timestamp": "2025-06-11T13:49:06.666745",
-                "last_updated": "2022-11-03T14:20:49.962000",
-                "file_name": "address_2022-11-3_14-20-49_962000.parquet",
-                "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
-            },
-            {
-                "table_name": "department",
-                "extraction_timestamp": "2025-06-11T13:49:10.367019",
-                "last_updated": "2022-11-03T14:20:49.962000",
-                "file_name": "department_2022-11-3_14-20-49_962000.parquet",
-                "key": "2022/11/3/department_2022-11-3_14-20-49_962000.parquet",
-            },
-            {
-                "table_name": "purchase_order",
-                "extraction_timestamp": "2025-06-11T13:49:14.569049",
-                "last_updated": "2025-06-11T13:32:09.975000",
-                "file_name": "purchase_order_2025-6-11_13-32-9_975000.parquet",
-                "key": "2025/6/11/purchase_order_2025-6-11_13-32-9_975000.parquet",
-            },
-            {
-                "table_name": "staff",
-                "extraction_timestamp": "2025-06-11T13:49:19.688113",
-                "last_updated": "2022-11-03T14:20:51.563000",
-                "file_name": "staff_2022-11-3_14-20-51_563000.parquet",
-                "key": "2022/11/3/staff_2022-11-3_14-20-51_563000.parquet",
-            },
-            {
-                "table_name": "payment_type",
-                "extraction_timestamp": "2025-06-11T13:49:23.627405",
-                "last_updated": "2022-11-03T14:20:49.962000",
-                "file_name": "payment_type_2022-11-3_14-20-49_962000.parquet",
-                "key": "2022/11/3/payment_type_2022-11-3_14-20-49_962000.parquet",
-            },
-            {
                 "table_name": "payment",
-                "extraction_timestamp": "2025-06-11T13:49:28.729186",
-                "last_updated": "2025-06-11T13:36:09.847000",
-                "file_name": "payment_2025-6-11_13-36-9_847000.parquet",
-                "key": "2025/6/11/payment_2025-6-11_13-36-9_847000.parquet",
+                "extraction_timestamp": "2025-06-11T14:31:49.412001",
+                "last_updated": "2025-06-11T14:27:10.332000",
+                "file_name": "payment_2025-6-11_14-27-10_332000.parquet",
+                "key": "2025/6/11/payment_2025-6-11_14-27-10_332000.parquet",
             },
             {
                 "table_name": "transaction",
-                "extraction_timestamp": "2025-06-11T13:49:38.765635",
-                "last_updated": "2025-06-11T13:36:09.847000",
-                "file_name": "transaction_2025-6-11_13-36-9_847000.parquet",
-                "key": "2025/6/11/transaction_2025-6-11_13-36-9_847000.parquet",
+                "extraction_timestamp": "2025-06-11T14:31:53.892931",
+                "last_updated": "2025-06-11T14:27:10.332000",
+                "file_name": "transaction_2025-6-11_14-27-10_332000.parquet",
+                "key": "2025/6/11/transaction_2025-6-11_14-27-10_332000.parquet",
             },
             {
                 "table_name": "design",
-                "extraction_timestamp": "2025-06-11T13:49:54.025634",
-                "last_updated": "2025-06-10T17:51:09.671000",
-                "file_name": "design_2025-6-10_17-51-9_671000.parquet",
-                "key": "2025/6/10/design_2025-6-10_17-51-9_671000.parquet",
+                "extraction_timestamp": "2025-06-11T14:31:57.612096",
+                "last_updated": "2025-06-11T14:30:09.707000",
+                "file_name": "design_2025-6-11_14-30-9_707000.parquet",
+                "key": "2025/6/11/design_2025-6-11_14-30-9_707000.parquet",
             },
             {
                 "table_name": "sales_order",
-                "extraction_timestamp": "2025-06-11T13:49:59.348065",
-                "last_updated": "2025-06-11T13:36:09.847000",
-                "file_name": "sales_order_2025-6-11_13-36-9_847000.parquet",
-                "key": "2025/6/11/sales_order_2025-6-11_13-36-9_847000.parquet",
-            },
-            {
-                "table_name": "currency",
-                "extraction_timestamp": "2025-06-11T13:50:07.969299",
-                "last_updated": "2022-11-03T14:20:49.962000",
-                "file_name": "currency_2022-11-3_14-20-49_962000.parquet",
-                "key": "2022/11/3/currency_2022-11-3_14-20-49_962000.parquet",
+                "extraction_timestamp": "2025-06-11T14:32:01.333070",
+                "last_updated": "2025-06-11T14:27:10.332000",
+                "file_name": "sales_order_2025-6-11_14-27-10_332000.parquet",
+                "key": "2025/6/11/sales_order_2025-6-11_14-27-10_332000.parquet",
             },
         ]
     }
