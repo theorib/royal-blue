@@ -155,8 +155,8 @@ class TestDimStaffDataframe:
         def raise_exception(*args, **kwargs):
             raise Exception("Unexpected error")
 
-        monkeypatch.setattr(
-            valid_dataframes["staff"], "merge", raise_exception
-        )
-        with pytest.raises(Exception, match="Error creating dim_staff: Unexpected error"):
+        monkeypatch.setattr(valid_dataframes["staff"], "merge", raise_exception)
+        with pytest.raises(
+            Exception, match="Error creating dim_staff: Unexpected error"
+        ):
             dim_staff_dataframe(**valid_dataframes)

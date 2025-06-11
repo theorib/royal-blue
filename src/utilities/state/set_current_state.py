@@ -24,7 +24,7 @@ def set_current_state(
 
     Raises:
         Exception: If the upload fails.
-"""
+    """
 
     try:
         json_data = orjson.dumps(current_state)

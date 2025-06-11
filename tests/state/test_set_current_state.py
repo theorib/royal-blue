@@ -1,9 +1,9 @@
 import json
+from unittest.mock import patch
 
 import boto3
 import pytest
 from moto import mock_aws
-from unittest.mock import patch
 
 from src.utilities.state.set_current_state import set_current_state
 
@@ -59,7 +59,9 @@ class TestSetCurrentState:
         s3, bucket = s3_fixture
         mock_state = {"some": "state"}
 
-        with patch("src.utilities.state.set_current_state.add_file_to_s3_bucket") as mock_upload:
+        with patch(
+            "src.utilities.state.set_current_state.add_file_to_s3_bucket"
+        ) as mock_upload:
             mock_upload.return_value = {"error": "Upload failed"}
             with pytest.raises(Exception, match="Failed to upload current state to S3"):
                 set_current_state(mock_state, bucket, s3)

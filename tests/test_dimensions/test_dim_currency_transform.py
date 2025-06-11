@@ -7,16 +7,17 @@ from src.utilities.dimensions.dim_currency_transform import dim_currency_datafra
 @pytest.fixture
 def valid_currency_dataframe():
     return {
-        "currency": pd.DataFrame({
-            "currency_id": [1, 2, 3],
-            "currency_code": ["USD", "EUR", "JPY"],
-        })
+        "currency": pd.DataFrame(
+            {
+                "currency_id": [1, 2, 3],
+                "currency_code": ["USD", "EUR", "JPY"],
+            }
+        )
     }
 
 
 @pytest.mark.describe("tests the functionality of the currency dimension function")
 class TestCurrencyDimensions:
-
     @pytest.mark.it("should return a DataFrame")
     def test_transform_returns_dataframe(self, valid_currency_dataframe):
         result = dim_currency_dataframe(**valid_currency_dataframe)
@@ -50,10 +51,12 @@ class TestCurrencyDimensions:
         def mock_merge(*args, **kwargs):
             raise RuntimeError("Unexpected failure during merge")
 
-        df = pd.DataFrame({
-            "currency_id": [1],
-            "currency_code": ["USD"],
-        })
+        df = pd.DataFrame(
+            {
+                "currency_id": [1],
+                "currency_code": ["USD"],
+            }
+        )
 
         monkeypatch.setattr(pd.DataFrame, "merge", mock_merge)
 
