@@ -10,8 +10,20 @@ def set_current_state(
     current_state: dict, bucket_name, s3_client, file_name="lambda_state.json"
 ):
     """
-    Converts the given dictionary to JSON and uploads it to S3 as lambda_state.json.
-    """
+    Converts the current state dictionary to JSON and uploads it to an S3 bucket as a state file.
+
+    Args:
+    current_state (dict): The current state to upload, as a dictionary.
+    bucket_name (str): The name of the S3 bucket where the state will be stored.
+    s3_client (Any): boto3 S3 client used for the upload.
+    file_name (str, optional): The name of the file to upload. Defaults to 'lambda_state.json'.
+
+    Returns:
+    dict: Result of the S3 upload operation. On success, contains info about the upload. On failure, contains error details.
+
+    Raises:
+    Exception: If the upload to S3 fails.
+    """ 
     try:
         json_data = json.dumps(current_state)
         result = add_to_s3_bucket(s3_client, bucket_name, file_name, json_data)
