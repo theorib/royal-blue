@@ -30,4 +30,4 @@ class ProcessState(BaseModel):
 
 class State(BaseModel):
     ingest_state: dict
-    process_state: ProcessState
+    transform_state: ProcessState
