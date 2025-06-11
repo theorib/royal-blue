@@ -9,7 +9,9 @@ from src.db.connection import connect_db
 logger = logging.getLogger(__name__)
 
 
-def create_db_entries_from_df(conn: Connection[DictRow], table_name: str, df: pd.DataFrame) -> None:
+def create_db_entries_from_df(
+    conn: Connection[DictRow], table_name: str, df: pd.DataFrame
+) -> None:
     """
     Inserts rows from a DataFrame into a specified PostgreSQL table using psycopg.
 
@@ -127,7 +129,6 @@ if __name__ == "__main__":
         Raises:
             ValueError: If input DataFrame is missing or transformation fails.
         """
-
 
         design_df = data_frame
 

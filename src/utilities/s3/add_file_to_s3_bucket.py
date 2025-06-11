@@ -3,18 +3,18 @@ from botocore.exceptions import ClientError
 
 def add_file_to_s3_bucket(client, bucket_name, key, body) -> dict[str, dict]:
     """
-    Uploads a file to an S3 bucket and handles common errors. 
-    
+    Uploads a file to an S3 bucket and handles common errors.
+
     Args:
     client: A boto3 S3 client object.
     bucket_name (str): The name of the S3 bucket to upload to.
     key (str): The S3 object key (i.e., the path and filename in the bucket).
     body (bytes): The file content as bytes to upload to S3.
-        
+
     Returns:
     dict: A dictionary indicating success or error. On success, contains a message and file info.
     On error, contains an error message and the raw error response.
-    
+
     Raises:
     None. Errors are caught and returned as part of the response dictionary.
     """

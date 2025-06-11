@@ -10,7 +10,9 @@ from src.utilities.s3.s3_error_map import s3_error_map
 logger = logging.getLogger(__name__)
 
 
-def get_current_state(s3_client, bucket_name, key="lambda_state.json", s3_error_map=s3_error_map) -> Dict[str, Any]:
+def get_current_state(
+    s3_client, bucket_name, key="lambda_state.json", s3_error_map=s3_error_map
+) -> Dict[str, Any]:
     """
     Retrieves the current state JSON from an S3 bucket and returns it as a dictionary.
     If the state file does not exist, initializes an empty state and uploads it to S3.
@@ -29,7 +31,6 @@ def get_current_state(s3_client, bucket_name, key="lambda_state.json", s3_error_
     """
     try:
         s3_response = get_file_from_s3_bucket(s3_client, bucket_name, key)
-
 
         if s3_response.get("error"):
             if (
