@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def create_parquet_from_data_frame(data_frame: pd.DataFrame):
+def create_parquet_from_data_frame(data_frame: pd.DataFrame) -> BytesIO:
     """
     Converts a valid, non-empty pandas DataFrame to a gzipped Parquet file stored in memory.
 

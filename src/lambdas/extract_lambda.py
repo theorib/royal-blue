@@ -37,6 +37,42 @@ logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event: EmptyDict, context: EmptyDict):
+    """
+    Extracts new or updated data from all tables in the TOTESYS database, converts the data into parquet files,
+    uploads them to an S3 bucket, and updates the extraction state. Designed to run as an AWS Lambda function
+    for incremental ETL processing.
+
+    Args:
+    event (EmptyDict): AWS Lambda event object (not used, included for compatibility).
+    context (EmptyDict): AWS Lambda context object (not used, included for compatibility).
+
+    Returns:
+    A JSON-encoded summary of the files processed, including table name, extraction timestamp,
+    last updated timestamp, file name, and S3 key.
+
+    Example of the output:
+    {
+        "files_to_process": [
+            {
+                "table_name": "counterparty",
+                "extraction_timestamp": "2025-06-10T20:51:34.260407",
+                "last_updated": "2022-11-03T14:20:51.563000",
+                "file_name": "counterparty_2022-11-3_14-20-51_563000.parquet",
+                "key": "2022/11/3/counterparty_2022-11-3_14-20-51_563000.parquet",
+            },
+            {
+                "table_name": "address",
+                "extraction_timestamp": "2025-06-10T20:51:37.179714",
+                "last_updated": "2022-11-03T14:20:49.962000",
+                "file_name": "address_2022-11-3_14-20-49_962000.parquet",
+                "key": "2022/11/3/address_2022-11-3_14-20-49_962000.parquet",
+            }
+    }
+
+    Raises:
+    Error: If a database error occurs during extraction.
+    Exception: If any other error occurs during the process, such as S3 upload failure or unexpected issues.
+    """
     conn = connect_db("TOTESYS")
     s3_client = boto3.client("s3")
     INGEST_ZONE_BUCKET_NAME = os.environ.get("INGEST_ZONE_BUCKET_NAME")

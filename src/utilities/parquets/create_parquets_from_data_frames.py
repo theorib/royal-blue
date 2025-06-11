@@ -1,10 +1,13 @@
 from datetime import datetime
 from io import BytesIO
+from typing import Any, Dict, Union
 
 import pandas as pd
 
 
-def create_parquets_from_data_frames(data: list):
+def create_parquets_from_data_frames(
+    data: list,
+) -> Dict[str, Union[Dict[str, Any], Dict[str, str]]]:
     """
     Converts a list of data frames into in-memory Parquet files.
 

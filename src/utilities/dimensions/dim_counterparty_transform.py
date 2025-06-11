@@ -1,23 +1,22 @@
-def dim_counterparty_dataframe(**dataframes):
+import pandas as pd
+
+
+def dim_counterparty_dataframe(**dataframes) -> pd.DataFrame:
     """
-    Transforms and returns a dimension dataframe for counterparties by merging with address data.
+    Create a dimension table for counterparties by merging with legal address data.
 
-    This function takes a dictionary of extracted dataframes, expects 'counterparty' and 'address' keys,
-    merges the counterparty data with the corresponding legal address details, renames the address fields
-    to OLAP-compliant snake_case names, and selects a subset of relevant columns.
-
-    Parameters:
-        extracted_dataframes (dict): A dictionary containing:
-            - 'counterparty': pd.DataFrame with at least 'counterparty_id', 'counterparty_legal_name', and 'legal_address_id'.
-            - 'address': pd.DataFrame with address information including 'legal_address_id' and address fields.
+    Args:
+        dataframes: Keyword arguments containing:
+            - counterparty: DataFrame with 'counterparty_id', 'counterparty_legal_name', 'legal_address_id'.
+            - address: DataFrame with 'address_id' and address fields.
 
     Returns:
-        pd.DataFrame: A transformed dimension dataframe containing counterparty and legal address fields.
+        A transformed DataFrame with counterparty and legal address fields.
 
     Raises:
-        ValueError: If either the 'counterparty' or 'address' dataframe is missing.
-        KeyError: If required columns are missing from the 'address' dataframe.
-        Exception: Propagates any other unexpected exception that occurs during processing.
+        ValueError: If 'counterparty' or 'address' is missing.
+        KeyError: If required columns are missing in the 'address' DataFrame.
+        Exception: For any other unexpected error.
     """
     required_keys = ["counterparty", "address"]
 

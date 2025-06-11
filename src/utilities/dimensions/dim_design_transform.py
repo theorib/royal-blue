@@ -3,24 +3,17 @@ import pandas as pd
 
 def dim_design_dataframe(**dataframes) -> pd.DataFrame:
     """
-    Create the design dimension DataFrame from the extracted raw design data.
+    Create a design dimension DataFrame from raw design data.
 
-    Parameters:
-    -----------
-    dataframes : dict
-        Dictionary containing raw DataFrames extracted from source tables.
-        Must contain a 'design' DataFrame.
+    Args:
+        dataframes: Keyword arguments containing:
+            - design: DataFrame with 'design_id', 'design_name', 'file_location', 'file_name'.
 
     Returns:
-    --------
-    pd.DataFrame
-        A DataFrame representing the design dimension with columns:
-        'design_id', 'design_name', 'file_location', 'file_name'.
+        A DataFrame with design dimension columns, duplicates removed.
 
     Raises:
-    -------
-    ValueError
-        If the 'design' table is missing or any error occurs during transformation.
+        ValueError: If 'design' DataFrame is missing or transformation fails.
     """
 
     required_keys = ["design"]

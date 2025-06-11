@@ -1,7 +1,22 @@
 import pandas as pd
 
 
-def dim_date_dataframe(start_date: str, end_date: str):
+def dim_date_dataframe(start_date: str, end_date: str) -> pd.DataFrame:
+    """
+    Generate a date dimension DataFrame with calendar attributes.
+
+    Args:
+        start_date: Start date string (e.g., 'YYYY-MM-DD').
+        end_date: End date string (e.g., 'YYYY-MM-DD').
+
+    Returns:
+        A DataFrame with columns for date_id, year, month, day, day_of_week,
+        day_name, month_name, and quarter.
+
+    Raises:
+        ValueError: If start_date or end_date are invalid dates.
+    """
+
     all_dates = pd.date_range(
         start=start_date, end=end_date, tz="Europe/London", normalize=True
     )

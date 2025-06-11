@@ -11,16 +11,19 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def filter_out_values(values: List[str], values_to_filter: List[str]):
+def filter_out_values(values: List[str], values_to_filter: List[str]) -> List[str]:
     """
-    Remove specified values from a list of strings.
+    Remove specific values from a list.
 
     Args:
-        values (List[str]): The original list of string values.
-        values_to_filter (List[str]): Values that should be removed from the list.
+        values: Original list of strings.
+        values_to_filter: Strings to remove from the list.
 
     Returns:
-        List[str]: A new list excluding the values in `values_to_filter`.
+        A new list with the filtered values removed.
+
+    Raises:
+        None
     """
     filtered = [value for value in values if value not in values_to_filter]
     return filtered
@@ -31,18 +34,20 @@ def get_totesys_table_names(
     table_names_to_filter_out: List[str] = ["_prisma_migrations"],
 ) -> List[str]:
     """
-    Retrieve the names of all public tables in the Totasys database, excluding specified ones.
+    Get all public table names from the Totesys database, excluding specified ones.
 
     Args:
-        conn (Connection[DictRow]): A database connection object.
-        table_names_to_filter_out (List[str], optional): Table names to exclude. Defaults to ['_prisma_migrations'].
+        conn: A PostgreSQL connection object.
+        table_names_to_filter_out: Tables to exclude from the results. Defaults to ['_prisma_migrations'].
 
     Returns:
-        List[str]: A list of table names that are not filtered out.
+        A list of table names not filtered out.
 
     Raises:
-        Exception: Returns a handled error dictionary if query fails.
+        psycopg.Error: If there's a database error.
+        Exception: For any unexpected errors.
     """
+
     query = """
         SELECT table_name
           FROM information_schema.tables
@@ -69,18 +74,24 @@ def get_totesys_table_names(
         return handle_db_exception(e)  # type: ignore
 
 
-def get_table_last_updated_timestamp(conn: Connection[DictRow], table_name: str):
+def get_table_last_updated_timestamp(
+    conn: Connection[DictRow], table_name: str
+) -> dict:
     """
-    Fetch the most recent 'last_updated' timestamp out of all records of a given table.
+    Get the latest 'last_updated' timestamp from a given table.
 
     Args:
-        conn (Connection[DictRow]): A database connection object.
-        table_name (str): The name of the table to query.
+        conn: A PostgreSQL connection object.
+        table_name: The name of the table to query.
 
     Returns:
-        dict: A dictionary with either:
-              - 'success': containing the table name and its max last_updated value
-              - 'error': if the query fails or the response is invalid
+        A dict with:
+            - 'success': If data was found.
+            - 'error': If no data or a query failure occurred.
+
+    Raises:
+        psycopg.Error: If there's a database error.
+        Exception: For any unexpected errors.
     """
     try:
         query = sql.SQL(
@@ -111,15 +122,19 @@ def get_table_data(
     conn: Connection[DictRow], table_name: str, last_updated: datetime | None = None
 ) -> List[DictRow]:
     """
-    Retrieve all data from a table, optionally filtering by 'last_updated' timestamp.
+    Get all rows from a table, optionally filtered by last_updated.
 
     Args:
-        conn (Connection[DictRow]): A database connection object.
-        table_name (str): The name of the table to query.
-        last_updated (datetime | None, optional): A datetime to filter records updated after. Defaults to None.
+        conn: A database connection.
+        table_name: The table to query.
+        last_updated: Filter for rows updated after this datetime.
 
     Returns:
-        List[DictRow]: A list of dictionaries.Each dictionary corresponds to a table row. Each key in a dictionary is the column name and the value is the row value for that column.
+        A list of row dictionaries.
+
+    Raises:
+        psycopg.Error: On database errors.
+        Exception: On other errors.
     """
 
     query = sql.SQL("SELECT * FROM public.{}").format(sql.Identifier(table_name))
@@ -140,13 +155,16 @@ def get_table_data(
 
 def handle_db_exception(e: Exception) -> dict:
     """
-    Handle database exceptions and return a formatted error message.
+    Format and log a database exception.
 
     Args:
-        e (Exception): The exception that was raised.
+        e: The exception to handle.
 
     Returns:
-        dict: A dictionary with an 'error' message describing the exception type and mapped message.
+        A dictionary with an error message.
+
+    Raises:
+        None
     """
     error_type = type(e).__name__
     error_message = ERROR_MAP.get(type(e), ERROR_MAP[Exception])
@@ -159,15 +177,18 @@ def handle_db_exception(e: Exception) -> dict:
     }
 
 
-def handle_psycopg_exceptions(e: Exception):
+def handle_psycopg_exceptions(e: Exception) -> dict:
     """
-    Handle database exceptions and return a formatted error message.
+    Format and log a psycopg exception.
 
     Args:
-        e (Exception): The exception that was raised.
+        e: The exception to handle.
 
     Returns:
-        dict: A dictionary with an 'error' message describing the exception type and mapped message.
+        A dictionary with an error message.
+
+    Raises:
+        None
     """
     error_type = type(e).__name__
     error_message = ERROR_MAP.get(type(e), ERROR_MAP[Exception])
