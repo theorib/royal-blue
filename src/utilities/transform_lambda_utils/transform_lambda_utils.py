@@ -50,7 +50,7 @@ def initialize_transform_state(state, table_names):
 
 # mutates result and state
 def add_log_to_result_and_state(
-    log: List[FilesToProcessItem],
+    log: FilesToProcessItem,
     result,
     state,
     table_name: str,
@@ -62,6 +62,7 @@ def add_log_to_result_and_state(
     state["transform_state"]["tables"][table_name]["transformation_timestamp"] = (
         processing_timestamp
     )
+    state["transform_state"]["tables"][table_name]["transform_log"] = []
     state["transform_state"]["tables"][table_name]["transform_log"].append(log)
 
     state["transform_state"]["last_updated"] = last_updated
